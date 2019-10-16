@@ -12,7 +12,7 @@ namespace MinvoiceWebService.Services
     {
         private static DataRequestObject SetupDataRequestObject(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int? signType, int typeOfInvoice = 1, int typeUpdate = 1)
         {
-            // test commit
+            // test commit 1
             DataRequestObject dataRequestObject = new DataRequestObject
             {
                 KyHieu = kyHieu,
