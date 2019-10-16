@@ -1,0 +1,17 @@
+﻿<Customers>
+  <Customer>
+    <Name><![CDATA[Công ty TNHH ABC sửa lại 984845]]></Name>
+    <Code><![CDATA[DLVP001000]]></Code>
+    <TaxCode><![CDATA[0100112966]]></TaxCode>
+    <Address><![CDATA[Địa chỉ]]></Address>
+    <BankAccountName><![CDATA[ABC]]></BankAccountName>
+    <BankName><![CDATA[Techcombank]]></BankName>
+    <BankNumber><![CDATA[123456789]]></BankNumber>
+    <Email><![CDATA[abc@fast.com.vn]]></Email>
+    <Fax><![CDATA[3740 4801]]></Fax>
+    <Phone><![CDATA[0987654321]]></Phone>
+    <ContactPerson><![CDATA[Liên hệ]]></ContactPerson>
+    <RepresentPerson><![CDATA[Người đại diện]]></RepresentPerson>
+    <CusType>1</CusType>
+  </Customer>
+</Customers>

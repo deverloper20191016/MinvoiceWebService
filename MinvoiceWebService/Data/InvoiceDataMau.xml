@@ -1,0 +1,156 @@
+﻿debugger;
+var table = webix.$$("windowData");
+var selectedItem = table.getSelectedItem();
+
+
+// set Config Column trước khi sửa 
+var table1 = webix.$$("edit_inv_invoiceauthdetail");
+var url = app.config.host + "/Invoice/GetDecimalPlace?ma_nt=" + selectedItem.currency_code;
+	webix.ajax().headers({ 'Content-type': 'application/text' }).get(url, function(text, data, XmlHttpRequest){
+
+		var arr = JSON.parse(text);
+		var keys = Object.keys(arr[0]);
+		for(var i =0 ; i < keys.length ; i++)
+		{
+			var node = keys[i].toString();
+			
+			var decimal_place = Array(Number(arr[0][node]) + 1).join("9");
+			var format_config = table1.getColumnConfig(keys[i]);
+			
+			format_config.format = webix.Number.numToStr({
+									groupDelimiter: ",",
+									groupSize: 3,
+									decimalDelimiter: ".",
+									decimalSize: Number(arr[0][node])
+								});
+
+			format_config.numericConfig = 
+			{
+				maximumValue: Number("999999999999." + decimal_place),
+				minValue: Number("-999999999999." + decimal_place),
+				decimalPlaces: Number(arr[0][node])
+			};
+		}
+	});
+	
+
+if (selectedItem.invoice_status == 5 || selectedItem.invoice_status == 19 || selectedItem.invoice_status == 21 || selectedItem.invoice_status == 3 || selectedItem.invoice_status == 23){
+	var form = $$("window-form");
+	 form.addView({
+		rows:[										
+			{
+				cols: [
+					{
+						view: "text",
+						id: "additional_reference_des_inv_invoiceauth",
+						name: "additional_reference_des",
+						label: _("SOVB"),
+						labelWidth: 100
+					},
+					{
+						view: "datepicker",
+						id: "additional_reference_date_inv_invoiceauth",
+						name: "additional_reference_date",
+						label: _("NGAYVB"),
+						labelWidth: 100
+					},
+				]
+			},
+			{
+				view: "text",
+				id: "additional_reference_note_inv_invoiceauth",
+				name: "additional_reference_note",
+				label: _("NOTE"),
+				labelWidth: 100
+			}										
+		]                                       
+    }, 0);
+	
+	var tblDetail = $$("edit_inv_invoiceauthdetail");
+	
+	if (selectedItem.invoice_status == 19 || selectedItem.invoice_status == 21 || selectedItem.invoice_status == 23){
+		tblDetail.showColumn("adjust_field");
+		for(var propt in form.elements){
+			if (propt!="additional_reference_des" && propt!="additional_reference_date"){
+				var id = propt + "_inv_invoiceauth";
+				$$(id).define("readonly", true);
+				$$(id).refresh();
+			}
+			
+		}
+		var parentView = tblDetail.getParentView();
+		var toolbar = parentView.getChildViews()[0];
+					
+		parentView.removeView(toolbar.config.id);
+	
+		tblDetail.getColumnConfig("item_code").editor=null;
+		tblDetail.getColumnConfig("unit_code").editor=null;
+		tblDetail.getColumnConfig("discount_percentage").editor=null;
+		tblDetail.getColumnConfig("total_amount").editor=null;	
+	}
+	else {
+		if(selectedItem.invoice_status == 3)
+		{
+			var columns = tblDetail.config.columns;
+
+			for(var i=0;i<columns.length;i++){
+				var column = columns[i];
+				column.editor = "text";	
+			}
+		}
+		else
+		{
+			var columns = tblDetail.config.columns;
+
+			for(var i=0;i<columns.length;i++){
+				var column = columns[i];
+				column.editor = null;	
+			}
+			
+			var colInv_itemName = tblDetail.getColumnConfig("item_name");
+			colInv_itemName.header = _("DIEN_GIAI");
+			colInv_itemName.width = null;
+			colInv_itemName.width = 450;	
+			colInv_itemName.editor = "popup";
+					
+			tblDetail.getColumnConfig("quantity").editor=null;
+			tblDetail.getColumnConfig("total_amount_without_vat").editor=null;
+			tblDetail.getColumnConfig("discount_amount").editor=null;
+			tblDetail.getColumnConfig("total_amount").editor=null;
+			tblDetail.getColumnConfig("vat_amount").editor=null;
+			var parentView = tblDetail.getParentView();
+			var toolbar = parentView.getChildViews()[0];
+						
+			parentView.removeView(toolbar.config.id);
+			
+			
+						
+			tblDetail.getColumnConfig("item_code").editor=null;
+			tblDetail.getColumnConfig("unit_code").editor=null;
+			tblDetail.getColumnConfig("discount_percentage").editor=null;
+			tblDetail.getColumnConfig("total_amount").editor=null;	
+		}
+	}
+	
+	
+			
+
+	tblDetail.refreshColumns();
+	tblDetail.refresh();
+	form.elements["additional_reference_des"].setValue(selectedItem.additional_reference_des);
+	form.elements["additional_reference_date"].setValue(new Date(selectedItem.additional_reference_date)));
+	form.elements["additional_reference_note"].setValue(selectedItem.additional_reference_note);
+	var topParent = form.getTopParentView();
+	topParent.getHead().setHTML("Hóa đơn điều chỉnh cho hóa đơn số " + selectedItem.integrated_number 
+						+ " ngày " + moment(selectedItem.inv_invoiceIssuedDate).format("DD/MM/YYYY") 
+						+ " ký hiệu " + selectedItem.invoice_series);
+	
+}
+
+if (selectedItem.invoice_status == 3){
+	var form = $$("window-form");
+	var topParent = form.getTopParentView();
+	topParent.getHead().setHTML("Hóa đơn thay thế cho hóa đơn số " + selectedItem.integrated_number
+						+ " ngày " + moment(selectedItem.inv_invoiceIssuedDate).format("DD/MM/YYYY") 
+						+ " ký hiệu " + selectedItem.invoice_series);
+}

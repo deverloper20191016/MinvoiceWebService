@@ -1,0 +1,58 @@
+﻿<Invoice>
+  <Master>
+    <CusCode>KH001</CusCode>
+    <Buyer>Nguyễn Văn A</Buyer>
+    <CusName>Công ty TNHH ABC</CusName>
+    <CusAddress>Hà Nội</CusAddress>
+    <CusTaxCode></CusTaxCode>
+    <PaymentMethod>TM</PaymentMethod>
+    <ArisingDate>2018-11-16</ArisingDate>
+    <Total>2150</Total>
+    <DiscountAmount>0</DiscountAmount>
+    <VatAmount>150</VatAmount>
+    <Amount>2000</Amount>
+    <EmailDeliver>nguyenhongcuong19961607@gmail.com</EmailDeliver>
+    <CusBankNo></CusBankNo>
+    <CusBankName></CusBankName>
+    <Currency>VND</Currency>
+    <ExRate>1</ExRate>
+    <SellBankNo></SellBankNo>
+    <SellBankName></SellBankName>
+    <InvNote></InvNote>
+    <NumberOrDucument></NumberOrDucument>
+    <DateOrDucument></DateOrDucument>
+    <NoteOfDocument></NoteOfDocument>
+  </Master>
+  <Details>
+    <Detail>
+      <No>1</No>
+      <ProdName>Hàng hóa 01</ProdName>
+      <ProdCode>HH01</ProdCode>
+      <ProdUnit>Chiếc</ProdUnit>
+      <ProdQuantity>10</ProdQuantity>
+      <ProdPrice>100</ProdPrice>
+      <Amount>1000</Amount>
+      <DiscountAmount></DiscountAmount>
+      <DiscountRate></DiscountRate>
+      <ProdVATAmount>100</ProdVATAmount>
+      <ProdVat>10</ProdVat>
+      <Promotion>0</Promotion>
+      <TotalAmount>1100</TotalAmount>
+    </Detail>
+    <Detail>
+      <No>2</No>
+      <ProdName>Hàng hóa 2</ProdName>
+      <ProdCode>HH02</ProdCode>
+      <ProdUnit>Cái</ProdUnit>
+      <ProdQuantity>1</ProdQuantity>
+      <ProdPrice>1000</ProdPrice>
+      <Amount>1000</Amount>
+      <DiscountAmount></DiscountAmount>
+      <DiscountRate></DiscountRate>
+      <ProdVATAmount>50</ProdVATAmount>
+      <ProdVat>5</ProdVat>
+      <Promotion>0</Promotion>
+      <TotalAmount>1050</TotalAmount>
+    </Detail>
+  </Details>
+</Invoice>
