@@ -29,7 +29,12 @@ namespace MinvoiceWebService
             var resutl = MinvoiceService.CreateInvoice(mst, userName, passWord, mauSo, kyHieu, "", xml, false);
             return resutl;
         }
-
+        [WebMethod]
+        public string CreateInvoiceVMD(string mst, string userName, string passWord, string mauSo, string kyHieu, string xml)
+        {
+            var resutl = MinvoiceService.CreateInvoice(mst, userName, passWord, mauSo, kyHieu, "", xml, false);
+            return resutl;
+        }
         [WebMethod]
         public string CreateInvoiceSaveSign(string mst, string userName, string passWord, string mauSo, string kyHieu, string xml, int typeFont)
         {
