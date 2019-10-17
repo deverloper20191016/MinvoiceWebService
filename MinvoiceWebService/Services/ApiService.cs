@@ -36,6 +36,7 @@ namespace MinvoiceWebService.Services
         public static JArray GetInvoiceByKey(string userName, string passWord, string serial, string pattern,
             string key, string mst)
         {
+            // test
             var webClient = LoginService.SetupWebClient(userName, passWord, mst);
 
             var json = "{\"command\":\"CM00024\" , parameter:{\"ma_dvcs\":\"" + "VP" + "\",\"mau_hd\":\"" + pattern +
