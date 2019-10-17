@@ -184,7 +184,7 @@ namespace MinvoiceWebService.Services
                                 jObjectResult.Add($"OK_{dataRequestObject.InvoiceNumber};{jArrayInvoice[0]["trang_thai_hd"].ToString()}_{trangThaiKy}", (dataRequestObject.TypeUpdate == 2 ? "Điều chỉnh" : "Cập nhật") + ($" hóa đơn số {dataRequestObject.InvoiceNumber} thành công. "));
                                 if (typeUpdate == 2)
                                 {
-                                    jObjectResult.Add($"OK_NEW;{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKyNew}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}-MaTraCuu_{dataResponse["data"]["sobaomat"]}"); 
+                                    jObjectResult.Add($"OK_NEW;{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKyNew}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu_{dataResponse["data"]["sobaomat"]}"); 
                                 }
                             }
                         }
@@ -254,7 +254,7 @@ namespace MinvoiceWebService.Services
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
                                     var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
-                                    jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}-MaTraCuu_{dataResponse["data"]["sobaomat"]}");
+                                    jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu_{dataResponse["data"]["sobaomat"]}");
                                 }
                             }
                         }
@@ -326,7 +326,7 @@ namespace MinvoiceWebService.Services
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
                                     var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
-                                    jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}-MaTraCuu_{dataResponse["data"]["sobaomat"]}");
+                                    jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu_{dataResponse["data"]["sobaomat"]}");
                                 }
                             }
                         }
