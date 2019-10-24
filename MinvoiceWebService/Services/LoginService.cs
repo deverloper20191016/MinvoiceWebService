@@ -37,6 +37,12 @@ namespace MinvoiceWebService.Services
             webClient.Headers[HttpRequestHeader.Authorization] = authorization;
         }
 
+        private static void CreateAuthorizationIPos(WebClient webClient, string token, string mst)
+        {
+            var authorization = "Bear " + token;
+            webClient.Headers[HttpRequestHeader.Authorization] = authorization;
+        }
+
         public static WebClient SetupWebClient(string userName, string passWord, string mst)
         {
             var webClient = new WebClient
@@ -46,6 +52,19 @@ namespace MinvoiceWebService.Services
             webClient.Headers.Add("Content-Type", "application/json; charset=utf-8");
 
             CreateAuthorization(webClient, userName, passWord, mst);
+            return webClient;
+        }
+
+
+        public static WebClient SetupWebClientIPos(string mst, string token)
+        {
+            var webClient = new WebClient
+            {
+                Encoding = Encoding.UTF8
+            };
+            webClient.Headers.Add("Content-Type", "application/json; charset=utf-8");
+
+            CreateAuthorizationIPos(webClient, token, mst);
             return webClient;
         }
 

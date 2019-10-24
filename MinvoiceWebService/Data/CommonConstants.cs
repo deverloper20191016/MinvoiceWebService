@@ -15,11 +15,25 @@ namespace MinvoiceWebService.Data
         public static readonly string UrlSaveApi = WebConfigurationManager.AppSettings["UrlSave"];
         public static readonly string UrlGetInfo = WebConfigurationManager.AppSettings["UrlGetInfo"];
         public static readonly string UrlPreviewPdf = WebConfigurationManager.AppSettings["UrlPreviewPdf"];
+
         public static readonly string ChoKy = "Chờ ký";
         public static readonly string DaKy = "Đã ký";
+        public static readonly string ChoNguoiMuaKy = "Chờ người mua ký";
+        public static readonly string NguoiMuaDaKy = "Người mua đã ký";
 
         public static readonly string UrlGetInvoiceNumberByDate =
             WebConfigurationManager.AppSettings["UrlGetInvoiceNumberByDate"];
+
+        // Cập nhật ngày 2019-10-23
+        public static readonly string UrlGetInvoiceById = WebConfigurationManager.AppSettings["UrlGetInvoiceById"];
+        public static readonly string UrlGetListInvoice = WebConfigurationManager.AppSettings["UrlGetListInvoice"];
+        public static readonly string UrlGetTbph = WebConfigurationManager.AppSettings["UrlGetTbph"];
+
+        public static readonly string UrlGetInvoiceByKeyApiBravo = WebConfigurationManager.AppSettings["UrlGetInvoiceByKeyApiBravo"];
+        public static readonly string UrlGetInvoiceFkeyApiBravo = WebConfigurationManager.AppSettings["UrlGetInvoiceFkeyApiBravo"];
+        public static readonly string UrlGetInvoiceByDateApiBravo = WebConfigurationManager.AppSettings["UrlGetInvoiceByDateApiBravo"];
+
+        public static readonly string UserCreateInvoiceIPos = WebConfigurationManager.AppSettings["UserCreateInvoiceIPos"];
 
 
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Web.WebSockets;
 using MinvoiceWebService.Data;
 using Newtonsoft.Json.Linq;
 
@@ -33,6 +34,45 @@ namespace MinvoiceWebService.Services
             return result;
         }
 
+        /// <summary>
+        /// Lấy hóa đơn theo Id
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="passWord"></param>
+        /// <param name="mst"></param>
+        /// <param name="id">Id của hóa đơn</param>
+        /// <returns></returns>
+        public static JObject GetInvoiceById(string userName, string passWord, string mst, string id)
+        {
+            var webClient = LoginService.SetupWebClient(userName, passWord, mst);
+            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceById}{id}";
+            var rs = webClient.DownloadString(url);
+            var result = JObject.Parse(rs);
+            return result;
+        }
+
+        public static JObject GetListInvoice(string userName, string passWord, string mst, string listId)
+        {
+            var webClient = LoginService.SetupWebClient(userName, passWord, mst);
+            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetListInvoice}";
+            var json = new JObject
+            {
+                {"data", listId }
+            };
+            var rs = webClient.UploadString(url, json.ToString());
+            if (rs.Equals("null"))
+            {
+                return new JObject
+                {
+                    {"error","Không tìm thấy hóa đơn" }
+                };
+            }
+
+            var result = JObject.Parse(rs);
+            return result;
+
+        }
+
         public static JArray GetInvoiceByKey(string userName, string passWord, string serial, string pattern,
             string key, string mst)
         {
@@ -61,13 +101,13 @@ namespace MinvoiceWebService.Services
             {
                 var response = webClient.UploadString(url, json);
                 var resultArray = JArray.Parse(response);
-                if( resultArray.Count > 0)
+                if (resultArray.Count > 0)
                 {
-                   return resultArray.FirstOrDefault(x =>
-                            x["mau_so"].ToString().Equals(mauSo) && x["ky_hieu"].ToString().Equals(kyHieu))?[
-                            "ctthongbao_id"]
-                        .ToString();
-                   
+                    return resultArray.FirstOrDefault(x =>
+                             x["mau_so"].ToString().Equals(mauSo) && x["ky_hieu"].ToString().Equals(kyHieu))?[
+                             "ctthongbao_id"]
+                         .ToString();
+
                 }
                 else
                 {

@@ -30,7 +30,7 @@ namespace MinvoiceWebService
             return resutl;
         }
         [WebMethod]
-        public string CreateInvoiceVMD(string mst, string userName, string passWord, string mauSo, string kyHieu, string xml)
+        public string CreateInvoiceVmd(string mst, string userName, string passWord, string mauSo, string kyHieu, string xml)
         {
             var resutl = MinvoiceService.CreateInvoice(mst, userName, passWord, mauSo, kyHieu, "", xml, false);
             return resutl;
@@ -158,7 +158,6 @@ namespace MinvoiceWebService
             return result;
         }
 
-
         #region Mobiphone
 
         //[WebMethod]
@@ -168,6 +167,68 @@ namespace MinvoiceWebService
         //    return "OK";
         //}
         #endregion
+
+
+        //Cập nhật ngày 2019-10-23
+
+        [WebMethod]
+        public string GetTbph(string mst, string userName, string passWord)
+        {
+            var json = MinvoiceService.GetTbph(mst, userName, passWord);
+            return json;
+        }
+
+        [WebMethod]
+        public string GetInvoiceById(string mst, string userName, string passWord, string id)
+        {
+            var result = MinvoiceService.GetInvoiceById(mst, userName, passWord, id);
+            return result;
+        }
+
+        [WebMethod]
+        public string GetListInvoice(string mst, string userName, string passWord, string listId)
+        {
+            var result = MinvoiceService.GetListInvoice(mst, userName, passWord, listId);
+            return result;
+        }
+
+        [WebMethod]
+        public string GetInvoiceBravoByKeyApi(string mst, string userName, string passWord, string keyBravo)
+        {
+            var result = MinvoiceService.GetInvoiceBravoByKeyApi(mst, userName, passWord, keyBravo);
+            return result;
+        }
+
+        [WebMethod]
+        public string GetInvoiceBravoByFKey(string mst, string userName, string passWord, string fKey)
+        {
+            var result = MinvoiceService.GetInvoiceBravoByFKey(mst, userName, passWord, fKey);
+            return result;
+        }
+
+        [WebMethod]
+        public string GetInvoiceBravoByDate(string mst, string userName, string passWord, string mauSo, string kyHieu, string tuNgay, string denNgay)
+        {
+            var result = MinvoiceService.GetInvoiceBravoByDate(mst, userName, passWord, kyHieu, mauSo, tuNgay, denNgay);
+            return result;
+        }
+
+        [WebMethod]
+        public string CreateInvoiceIPos(string mst, string kyHieu,
+            string mauSo, string xml, string token)
+        {
+            var result = MinvoiceService.CreateInvoiceIPos(mst, "", "", kyHieu, mauSo, xml, token);
+            return result;
+        }
+
+
+        [WebMethod]
+        public string DeleteInvoice(string mst, string userName,
+            string passWord, string id)
+        {
+            var result = MinvoiceService.DeleteInvoice(mst, userName, passWord, id);
+            return result;
+        }
 
     }
 }

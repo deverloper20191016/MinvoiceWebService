@@ -64,6 +64,7 @@ namespace MinvoiceWebService.Converts
                 {"hop_dong_kte",invoice.Master.HopDongKinhTe },
                 {"voi_tochuc",invoice.Master.ToChuc },
                 {"inv_vatPercentage",invoice.Master.VATRate },
+                {"key_api",invoice.Master.Key },
 
                 {"field1",invoice.Master.Field1 },
                 {"field2",invoice.Master.Field2 },

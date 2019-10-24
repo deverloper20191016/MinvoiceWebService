@@ -177,14 +177,14 @@ namespace MinvoiceWebService.Services
                         }
                         else
                         {
-                            if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data")) 
+                            if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                             {
                                 var trangThaiKy = jArrayInvoice[0]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : jArrayInvoice[0]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                 var trangThaiKyNew = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
-                                jObjectResult.Add($"OK_{dataRequestObject.InvoiceNumber};{jArrayInvoice[0]["trang_thai_hd"].ToString()}_{trangThaiKy}", (dataRequestObject.TypeUpdate == 2 ? "Điều chỉnh" : "Cập nhật") + ($" hóa đơn số {dataRequestObject.InvoiceNumber} thành công. "));
+                                jObjectResult.Add($"OK_{dataRequestObject.InvoiceNumber};{jArrayInvoice[0]["trang_thai_hd"]}_{trangThaiKy}", (dataRequestObject.TypeUpdate == 2 ? "Điều chỉnh" : "Cập nhật") + ($" hóa đơn số {dataRequestObject.InvoiceNumber} thành công. "));
                                 if (typeUpdate == 2)
                                 {
-                                    jObjectResult.Add($"OK_NEW;{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKyNew}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu_{dataResponse["data"]["sobaomat"]}"); 
+                                    jObjectResult.Add($"OK_NEW;{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKyNew}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu_{dataResponse["data"]["sobaomat"]}");
                                 }
                             }
                         }
@@ -285,7 +285,7 @@ namespace MinvoiceWebService.Services
         /// <param name="typeOfInvoice">inv_adjustmentType của hóa đơn</param>
         /// <param name="typeUpdate"></param>
         /// <returns></returns>
-        public static string CreateInvoiceVMD(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int typeOfInvoice = 1, int typeUpdate = 1)
+        public static string CreateInvoiceVmd(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int typeOfInvoice = 1, int typeUpdate = 1)
         {
             JObject jObjectResult = new JObject();
 
@@ -515,7 +515,7 @@ namespace MinvoiceWebService.Services
                             {
                                 if (jObjectRs.ContainsKey("error"))
                                 {
-                                    jObjectResult.Add($"ERROR_{invoiceCancel.InvNumber}", $"{jObjectRs["error"].ToString()}");
+                                    jObjectResult.Add($"ERROR_{invoiceCancel.InvNumber}", $"{jObjectRs["error"]}");
 
                                 }
                             }
@@ -666,8 +666,6 @@ namespace MinvoiceWebService.Services
 
         }
 
-
-
         public static string DownloadPdfBase64(string mst, string userName, string passWord, string mauSo, string kyHieu,
             string invoiceNumber)
         {
@@ -703,5 +701,308 @@ namespace MinvoiceWebService.Services
             }
             return null;
         }
+
+
+        // Cập nhật ngày 2019-10-23
+        public static string GetTbph(string mst, string userName, string passWord)
+        {
+            var json = new JObject();
+            try
+            {
+                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetTbph}";
+
+                var rs = webClient.DownloadString(url);
+                var result = JArray.Parse(rs);
+                if (result.Count > 0)
+                {
+                    json.Add("OK", result);
+                }
+                else
+                {
+                    json.Add("ERROR", "Không tìm thấy thông báo phát hành");
+                }
+
+                return json.ToString();
+            }
+            catch (Exception e)
+            {
+                json.Add("ERROR", e.Message);
+                return json.ToString();
+            }
+        }
+
+        public static string GetInvoiceById(string mst, string userName, string passWord, string id)
+        {
+            JObject json = new JObject();
+            try
+            {
+                var invoice = ApiService.GetInvoiceById(userName, passWord, mst, id);
+                if (invoice.ContainsKey("error"))
+                {
+                    json.Add("ERROR", invoice["error"].ToString());
+                    return json.ToString();
+                }
+
+                json.Add("id", invoice["inv_InvoiceAuth_id"].ToString());
+                json.Add("inv_invoiceNumber", invoice["inv_invoiceNumber"]);
+                json.Add("key", invoice["so_benh_an"]);
+                json.Add("trang_thai", invoice["trang_thai"]);
+                json.Add("trang_thai_hd", invoice["trang_thai_hd"]);
+                json.Add("mau_so", invoice["mau_hd"]);
+                json.Add("ky_hieu", invoice["inv_invoiceSeries"]);
+                var trangThaiKy = invoice["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : invoice["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                json.Add("trang_thai_ky", trangThaiKy);
+
+                var result = new JObject
+                {
+                    {$"OK_{id}", json}
+                };
+                return result.ToString();
+            }
+            catch (Exception e)
+            {
+                json.Add("ERROR", e.Message);
+                return json.ToString();
+            }
+
+        }
+
+        public static string GetListInvoice(string mst, string userName, string passWord, string listId)
+        {
+            var json = new JObject();
+            try
+            {
+                var data = ApiService.GetListInvoice(userName, passWord, mst, listId);
+                if (data.ContainsKey("error"))
+                {
+                    json.Add("ERROR", data["error"]);
+                    return json.ToString();
+                }
+                json.Add("OK", data);
+                return json.ToString();
+            }
+            catch (Exception ex)
+            {
+                json.Add("ERROR", ex.Message);
+                return json.ToString();
+            }
+        }
+
+        public static string GetInvoiceBravoByKeyApi(string mst, string userName, string passWord, string keyBravo)
+        {
+            var json = new JObject();
+            try
+            {
+                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceByKeyApiBravo}{keyBravo}";
+
+                var rs = webClient.DownloadString(url);
+                var result = JObject.Parse(rs);
+
+                if (result.ContainsKey("Inv_InvoiceAuth_id"))
+                {
+                    json.Add("OK", result);
+                }
+                else
+                {
+                    json.Add("ERROR", "Không tìm thấy hóa đơn");
+                }
+
+                return json.ToString();
+            }
+            catch (Exception e)
+            {
+                json.Add("ERROR", e.Message);
+                return json.ToString();
+            }
+        }
+
+        public static string GetInvoiceBravoByFKey(string mst, string userName, string passWord, string fKey)
+        {
+            var json = new JObject();
+            try
+            {
+                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceFkeyApiBravo}";
+
+                var data = new JObject
+                {
+                    {"data", fKey}
+                };
+
+                var rs = webClient.UploadString(url, data.ToString());
+                var result = JObject.Parse(rs);
+                if (result.ContainsKey("data"))
+                {
+                    json.Add("OK", result);
+                }
+                else
+                {
+                    json.Add("ERROR", "Không tìm thấy hóa đơn");
+                }
+
+                return json.ToString();
+            }
+            catch (Exception e)
+            {
+                json.Add("ERROR", e.Message);
+                return json.ToString();
+            }
+        }
+
+        public static string GetInvoiceBravoByDate(string mst, string userName, string passWord, string kyHieu, string mauSo, string tuNgay, string denNgay)
+        {
+            var json = new JObject();
+            try
+            {
+                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceByDateApiBravo}";
+
+                var data = new JObject
+                {
+                    {"tu_ngay", tuNgay},
+                    {"den_ngay", denNgay},
+                    {"ky_hieu", kyHieu},
+                    {"mau_so", mauSo},
+                };
+
+                var rs = webClient.UploadString(url, data.ToString());
+                var result = JArray.Parse(rs);
+                if (result.Count > 0)
+                {
+                    json.Add("OK", result);
+                }
+                else
+                {
+                    json.Add("ERROR", "Không tìm thấy hóa đơn");
+                }
+
+                return json.ToString();
+            }
+            catch (Exception e)
+            {
+                json.Add("ERROR", e.Message);
+                return json.ToString();
+            }
+        }
+
+        public static string CreateInvoiceIPos(string mst, string userName, string passWord, string kyHieu,
+            string mauSo, string xml, string token)
+        {
+            JObject jObjectResult = new JObject();
+
+            if (string.IsNullOrEmpty(mst) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(mauSo) || string.IsNullOrEmpty(kyHieu) || string.IsNullOrEmpty(xml))
+            {
+                jObjectResult.Add("ERROR", "Vui lòng nhập đủ thông tin");
+                return jObjectResult.ToString();
+            }
+
+            DataRequestObject dataRequestObject = SetupDataRequestObject(mst, userName, passWord, mauSo, kyHieu, "", xml, false, null);
+
+            try
+            {
+                List<Invoice> invoices = DataConvert.GetListInvoiceByXml(dataRequestObject.XmlData);
+
+                if (invoices.Count > 0)
+                {
+                    foreach (var invoice in invoices)
+                    {
+                        JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
+                        var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UserCreateInvoiceIPos}";
+                        var dataRequest = jObjectMinvoice.ToString();
+                        var webClient = LoginService.SetupWebClientIPos(mst, token);
+                        var rs = webClient.UploadString(url, dataRequest);
+                        var dataResponse = JObject.Parse(rs);
+                        if (dataResponse.ContainsKey("error"))
+                        {
+                            jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
+                        }
+                        else
+                        {
+                            if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
+                            {
+                                var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
+                            }
+                        }
+                    }
+
+                    return jObjectResult.ToString();
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                jObjectResult.Add("ERROR", ex.Message);
+                return jObjectResult.ToString();
+            }
+        }
+
+        public static string DeleteInvoice(string mst, string userName, string passWord, string id)
+        {
+            var json = new JObject();
+            try
+            {
+                var invoiceSearch = ApiService.GetInvoiceById(userName, passWord, mst, id);
+
+                if (invoiceSearch.ContainsKey("error"))
+                {
+                    json.Add($"ERROR_DELETE_{id}", invoiceSearch["error"].ToString());
+                    return json.ToString();
+                }
+
+                var status = invoiceSearch["trang_thai"].ToString();
+                if (status.Equals(CommonConstants.DaKy) || status.Equals(CommonConstants.ChoNguoiMuaKy) ||
+                    status.Equals(CommonConstants.NguoiMuaDaKy))
+                {
+                    json.Add("ERROR_INVOICE_SIGNED",
+                        $"Hóa đơn có Id = {id} đã ký. Không thể xóa");
+                    return json.ToString();
+
+                }
+
+                var jArray = new JArray();
+                var a = new JObject
+                {
+                    {"inv_InvoiceAuth_id", id}
+                };
+                jArray.Add(a);
+
+                var dataRequest = new JObject
+                {
+                    {"windowid", "WIN00187"},
+                    {"editmode", 3},
+                    {
+                        "data", jArray
+                    }
+                };
+                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSaveApi}";
+
+                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                var rs = webClient.UploadString(url, dataRequest.ToString());
+                var dataResponse = JObject.Parse(rs);
+
+                if (dataResponse.ContainsKey("error"))
+                {
+                    json.Add($"ERROR_DELETE_{id}", $"{dataResponse["error"]}");
+                    return json.ToString();
+                }
+
+                if (dataResponse.ContainsKey("ok"))
+                    json.Add($"OK_DELETE_{id}",
+                        $"Xóa hóa đơn có Id: {id} thành công");
+                return json.ToString();
+            }
+            catch (Exception ex)
+            {
+                json.Add(new JObject
+                {
+                    {"ERROR", ex.Message}
+                });
+                return json.ToString();
+            }
+        }
+
     }
 }
