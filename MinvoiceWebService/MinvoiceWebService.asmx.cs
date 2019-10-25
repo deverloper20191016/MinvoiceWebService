@@ -237,5 +237,13 @@ namespace MinvoiceWebService
             var result = MinvoiceService.SignInvoices(mst, userName, passWord, listId);
             return result;
         }
+
+        [WebMethod]
+        public string SubstituteInvoice(string mst, string userName, string passWord, string mauSo, string kyHieu,
+            string idOfInvoiceAdjment, string xml)
+        {
+            var result = MinvoiceService.SubstituteInvoice(mst, userName, passWord, mauSo, kyHieu, idOfInvoiceAdjment, xml, false);
+            return result;
+        }
     }
 }

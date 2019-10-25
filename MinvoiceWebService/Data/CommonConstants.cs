@@ -17,6 +17,7 @@ namespace MinvoiceWebService.Data
         public static readonly string UrlPreviewPdf = WebConfigurationManager.AppSettings["UrlPreviewPdf"];
 
         public static readonly string ChoKy = "Chờ ký";
+        public static readonly string ChoDuyet = "Chờ duyệt";
         public static readonly string DaKy = "Đã ký";
         public static readonly string ChoNguoiMuaKy = "Chờ người mua ký";
         public static readonly string NguoiMuaDaKy = "Người mua đã ký";
@@ -38,6 +39,7 @@ namespace MinvoiceWebService.Data
         // Cập nhật ngày 2019-10-25
 
         public static readonly string UrlSignInvoice = WebConfigurationManager.AppSettings["UrlSignInvoice"];
+        public static readonly string UrlSubstituteInvoice = WebConfigurationManager.AppSettings["UrlSubstituteInvoice"];
 
         //public static string UrlLogin = $"{Potocol}{Mst}.{UrlLoginApi}";
         //public static string UrlExecuteCommand = $"{Potocol}{Mst}.{UrlExecuteCommandApi}";
