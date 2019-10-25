@@ -32,17 +32,17 @@
     <Master>
       <Key>cuong36363</Key>
       <CusCode>KH001</CusCode>
-      <Buyer>Nguyễn Văn B sửa lại</Buyer>
-      <CusName>Công ty TNHH ABC sửa lại</CusName>
+      <Buyer>Nguyễn Văn B </Buyer>
+      <CusName>Công ty TNHH ABC</CusName>
       <CusAddress>Hà Nội</CusAddress>
       <CusTaxCode/>
       <PaymentMethod>TM</PaymentMethod>
-      <ArisingDate>2019-04-17</ArisingDate>
+      <ArisingDate>2019-10-25</ArisingDate>
       <Total/>
       <DiscountAmount>0</DiscountAmount>
       <VatAmount/>
       <Amount/>
-      <EmailDeliver>nguyenhongcuong19961607@gmail.com</EmailDeliver>
+      <EmailDeliver>minvoice@gmail.com</EmailDeliver>
       <CusBankNo/>
       <CusBankName/>
       <Currency>VND</Currency>

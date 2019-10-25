@@ -35,7 +35,9 @@ namespace MinvoiceWebService.Data
 
         public static readonly string UserCreateInvoiceIPos = WebConfigurationManager.AppSettings["UserCreateInvoiceIPos"];
 
+        // Cập nhật ngày 2019-10-25
 
+        public static readonly string UrlSignInvoice = WebConfigurationManager.AppSettings["UrlSignInvoice"];
 
         //public static string UrlLogin = $"{Potocol}{Mst}.{UrlLoginApi}";
         //public static string UrlExecuteCommand = $"{Potocol}{Mst}.{UrlExecuteCommandApi}";

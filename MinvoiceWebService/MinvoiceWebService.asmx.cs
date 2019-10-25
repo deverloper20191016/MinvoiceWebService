@@ -230,5 +230,12 @@ namespace MinvoiceWebService
             return result;
         }
 
+        [WebMethod]
+        public string SignInvoice(string mst, string userName,
+          string passWord, string listId)
+        {
+            var result = MinvoiceService.SignInvoices(mst, userName, passWord, listId);
+            return result;
+        }
     }
 }

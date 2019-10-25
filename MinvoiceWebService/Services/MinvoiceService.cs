@@ -908,6 +908,12 @@ namespace MinvoiceWebService.Services
                 {
                     foreach (var invoice in invoices)
                     {
+                        if (string.IsNullOrEmpty(invoice.Master.Key))
+                        {
+                            jObjectResult.Add("ERROR", "Vui lòng nhập key");
+                            return jObjectResult.ToString();
+                        }
+
                         JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                         var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UserCreateInvoiceIPos}";
                         var dataRequest = jObjectMinvoice.ToString();
@@ -1001,6 +1007,56 @@ namespace MinvoiceWebService.Services
                     {"ERROR", ex.Message}
                 });
                 return json.ToString();
+            }
+        }
+
+
+        // Cập nhật 2019-10-25
+        public static string SignInvoices(string mst, string userName, string passWord , string listId)
+        {
+            var json = new JObject();
+            try
+            {
+                var listIdSign = listId.Split(',');
+                var array = new JArray();
+                foreach (var id in listIdSign)
+                {
+                    var item = new JObject
+                    {
+                        {"inv_InvoiceAuth_id", id}
+                    };
+                    array.Add(item);
+                }
+
+                var data = new JObject
+                {
+                    {"data", array }
+                };
+
+                var dataRequest = data.ToString();
+                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSignInvoice}";
+                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                var rs = webClient.UploadString(url, dataRequest);
+                var dataResponse = JObject.Parse(rs);
+                if (dataResponse.ContainsKey("error"))
+                {
+                    json.Add("ERROR_SIGN", dataResponse["error"]);
+                    return json.ToString();
+                }
+                var count = JArray.Parse(dataResponse["data"].ToString()).Count;
+                if (count > 0)
+                {
+                    json.Add("OK_SIGN", dataResponse);
+                    return json.ToString();
+                }
+                json.Add("ERROR_SIGN", "Hóa đơn đã ký");
+                return json.ToString();
+            }
+            catch (Exception ex)
+            {
+                json.Add("ERROR", ex.Message);
+                return json.ToString();
+                throw;
             }
         }
 
