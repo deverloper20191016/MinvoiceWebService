@@ -1,4 +1,4 @@
-﻿<pre style="font-family: Consolas; font-size: 13; color: black; background: white;"><span style="color:blue;">&lt;</span><span style="color:#a31515;">Invoices</span><span style="color:blue;">&gt;</span>
+﻿<!--<pre style="font-family: Consolas; font-size: 13; color: black; background: white;"><span style="color:blue;">&lt;</span><span style="color:#a31515;">Invoices</span><span style="color:blue;">&gt;</span>
 <span style="color:blue;">&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Invoice</span><span style="color:blue;">&gt;</span>
 <span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Master</span><span style="color:blue;">&gt;</span>
 <span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Key</span><span style="color:blue;">&gt;</span>cuong36363<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Key</span><span style="color:blue;">&gt;</span>
@@ -74,4 +74,82 @@
 <span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/</span><span style="color:#a31515;">Detail</span><span style="color:blue;">&gt;</span>
 <span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;/</span><span style="color:#a31515;">Details</span><span style="color:blue;">&gt;</span>
 <span style="color:blue;">&nbsp;&nbsp;&lt;/</span><span style="color:#a31515;">Invoice</span><span style="color:blue;">&gt;</span>
-<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Invoices</span><span style="color:blue;">&gt;</span></pre>
+<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Invoices</span><span style="color:blue;">&gt;</span></pre>-->
+
+<Invoices>
+  <Invoice>
+    <Master>
+      <Key>cuong36363</Key>
+      <CusCode>KH001</CusCode>
+      <Buyer>Nguyễn Văn B sửa lại</Buyer>
+      <CusName>Công ty TNHH ABC sửa lại</CusName>
+      <CusAddress>Hà Nội</CusAddress>
+      <CusTaxCode/>
+      <PaymentMethod>TM</PaymentMethod>
+      <ArisingDate>2019-11-05</ArisingDate>
+      <Total/>
+      <DiscountAmount>0</DiscountAmount>
+      <VatAmount/>
+      <Amount/>
+      <EmailDeliver>nguyenhongcuong19961607@gmail.com</EmailDeliver>
+      <CusBankNo/>
+      <CusBankName/>
+      <Currency>VND</Currency>
+      <ExRate>1</ExRate>
+      <SellBankNo/>
+      <SellBankName/>
+      <InvNote>Điều chỉnh</InvNote>
+      <NumberOrDucument>VB0001</NumberOrDucument>
+      <DateOrDucument>2019-04-17</DateOrDucument>
+      <NoteOfDocument>Điều chinh</NoteOfDocument>
+      <SoDienThoai>0106026495</SoDienThoai>
+      <KhoXuat>ABC</KhoXuat>
+      <KhoNhap>123456</KhoNhap>
+      <CanCuSo/>
+      <HopDongNgay/>
+      <HopDongCua/>
+      <NguoiVanChuyen>Nguyễn Văn A</NguoiVanChuyen>
+      <HopDong/>
+      <PhuongTien>Ô tô</PhuongTien>
+      <NgayNhap/>
+      <NgayXuat/>
+      <Field1>Test</Field1>
+      <Field2>Test</Field2>
+    </Master>
+    <Details>
+      <Detail>
+        <No>1</No>
+        <ProdName>Hàng hóa 01</ProdName>
+        <ProdCode>HH01</ProdCode>
+        <ProdUnit>Chiếc</ProdUnit>
+        <ProdQuantity>10</ProdQuantity>
+        <ProdPrice>100</ProdPrice>
+        <Amount>1000</Amount>
+        <DiscountAmount/>
+        <DiscountRate/>
+        <ProdVatAmount>100</ProdVatAmount>
+        <ProdVat>10</ProdVat>
+        <Promotion>0</Promotion>
+        <TotalAmount>1100</TotalAmount>
+        <Field1>10000</Field1>
+        <Field2>20000</Field2>
+      </Detail>
+      <Detail>
+        <No>2</No>
+        <ProdName>Hàng hóa 2</ProdName>
+        <ProdCode>HH02</ProdCode>
+        <ProdUnit>Cái</ProdUnit>
+        <ProdQuantity>1</ProdQuantity>
+        <ProdPrice>1000</ProdPrice>
+        <Amount>1000</Amount>
+        <DiscountAmount/>
+        <DiscountRate/>
+        <ProdVatAmount>50</ProdVatAmount>
+        <ProdVat>5</ProdVat>
+        <Promotion>0</Promotion>
+        <TotalAmount>1050</TotalAmount>
+        <Field1>15000</Field1>
+      </Detail>
+    </Details>
+  </Invoice>
+</Invoices>

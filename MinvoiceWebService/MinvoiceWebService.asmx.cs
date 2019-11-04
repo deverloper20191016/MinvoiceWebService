@@ -230,5 +230,15 @@ namespace MinvoiceWebService
             return result;
         }
 
+
+        // Cập nhật 2019-11-04
+
+        [WebMethod]
+        public string CreateInvoiceAugust(string mst, string userName, string passWord, string mauSo, string kyHieu, string xml)
+        {
+            var resutl = MinvoiceService.CreateInvoiceAugust(mst, userName, passWord, mauSo, kyHieu, "", xml, false);
+            return resutl;
+        }
+
     }
 }

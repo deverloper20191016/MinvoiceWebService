@@ -271,6 +271,64 @@ namespace MinvoiceWebService.Services
             }
         }
 
+        public static string CreateInvoiceAugust(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int typeOfInvoice = 1, int typeUpdate = 1)
+        {
+            JObject jObjectResult = new JObject();
+
+            if (string.IsNullOrEmpty(mst) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(passWord) || string.IsNullOrEmpty(mauSo) || string.IsNullOrEmpty(kyHieu) || string.IsNullOrEmpty(xml))
+            {
+                jObjectResult.Add("ERROR", "Vui lòng nhập đủ thông tin");
+                return jObjectResult.ToString();
+            }
+
+            DataRequestObject dataRequestObject = SetupDataRequestObject(mst, userName, passWord, mauSo, kyHieu, invoiceNumber, xml, opt, null, typeOfInvoice, typeUpdate);
+            try
+            {
+                List<Invoice> invoices = DataConvert.GetListInvoiceByXml(dataRequestObject.XmlData);
+
+                if (invoices.Count > 0)
+                {
+                    foreach (var invoice in invoices)
+                    {
+                        JArray jArrayInvoice = ApiService.GetInvoiceByKey(dataRequestObject.Username, dataRequestObject.Password, dataRequestObject.KyHieu, dataRequestObject.MauSo, invoice.Master.Key, mst);
+                        if (jArrayInvoice.Count > 0)
+                        {
+                            jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key} đã tồn tại");
+                        }
+                        else
+                        {
+                            JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
+                            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
+                            var dataRequest = jObjectMinvoice.ToString();
+                            var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
+                            var rs = webClient.UploadString(url, dataRequest);
+                            var dataResponse = JObject.Parse(rs);
+                            if (dataResponse.ContainsKey("error"))
+                            {
+                                jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
+                            }
+                            else
+                            {
+                                if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
+                                {
+                                    var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                    jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}+{dataResponse["data"]["inv_invoiceNumber"]}");
+                                }
+                            }
+                        }
+                    }
+
+                    return jObjectResult.ToString();
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                jObjectResult.Add("ERROR", ex.Message);
+                return jObjectResult.ToString();
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
