@@ -271,7 +271,7 @@ namespace MinvoiceWebService.Services
             }
         }
 
-        public static string CreateInvoiceAugust(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int typeOfInvoice = 1, int typeUpdate = 1)
+        public static string CreateInvoiceAugges(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int typeOfInvoice = 1, int typeUpdate = 1)
         {
             JObject jObjectResult = new JObject();
 

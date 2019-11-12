@@ -230,5 +230,20 @@ namespace MinvoiceWebService
             return result;
         }
 
+        // Cập nhật 2019-11-04
+        [WebMethod]
+        public string CreateInvoiceAugges(string mst, string userName, string passWord, string mauSo, string kyHieu, string xml)
+        {
+            var resutl = MinvoiceService.CreateInvoiceAugges(mst, userName, passWord, mauSo, kyHieu, "", xml, false);
+            return resutl;
+        }
+
+        // Cập nhật 2019-11-12
+        [WebMethod]
+        public string SignInvoice(string mst, string userName, string passWord, string listId)
+        {
+            var resutl = MinvoiceService.SignInvoices(mst, userName, passWord, listId);
+            return resutl;
+        }
     }
 }
