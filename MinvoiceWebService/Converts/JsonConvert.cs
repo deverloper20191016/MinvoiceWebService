@@ -114,6 +114,7 @@ namespace MinvoiceWebService.Converts
                 JObject jObjectData = new JObject
                 {
                     {"stt_rec0", detail.No},
+                    {"stt1", detail.No1},
                     {"inv_itemCode", detail.ProdCode},
                     {"inv_itemName", detail.ProdName},
                     {"inv_unitCode", detail.ProdUnit},

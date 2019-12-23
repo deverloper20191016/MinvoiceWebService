@@ -300,6 +300,9 @@ namespace MinvoiceWebService.Converts
                     NoiSanXuat = !string.IsNullOrEmpty(xmlNodeListDetail.SelectSingleNode("NoiSanXuat")?.InnerText)
                         ? xmlNodeListDetail.SelectSingleNode("NoiSanXuat")?.InnerText
                         : null,
+                    No1 = !string.IsNullOrEmpty(xmlNodeListDetail.SelectSingleNode("No1")?.InnerText)
+                        ? xmlNodeListDetail.SelectSingleNode("No1")?.InnerText
+                        : null,
                 };
 
 

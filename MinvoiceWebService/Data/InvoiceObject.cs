@@ -345,6 +345,10 @@ namespace MinvoiceWebService.Data
         public string Field8 { get; set; }
         public string Field9 { get; set; }
         public string Field10 { get; set; }
+        /// <summary>
+        /// stt1: Số thứ tự
+        /// </summary>
+        public string No1 { get; set; }
     }
 
     public class InvoiceCancel
