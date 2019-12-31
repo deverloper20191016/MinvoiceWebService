@@ -241,7 +241,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                            var dataRequest = jObjectMinvoice.ToString();
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -299,7 +299,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                            var dataRequest = jObjectMinvoice.ToString();
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&"); 
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -371,7 +371,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                            var dataRequest = jObjectMinvoice.ToString();
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&"); 
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -445,7 +445,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddSignApi}";
-                            var dataRequest = jObjectMinvoice.ToString();
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&"); 
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -504,7 +504,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddSseApi}";
-                            var dataRequest = jObjectMinvoice.ToString();
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&"); 
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -1114,7 +1114,6 @@ namespace MinvoiceWebService.Services
             {
                 json.Add("ERROR", ex.Message);
                 return json.ToString();
-                throw;
             }
         }
 
