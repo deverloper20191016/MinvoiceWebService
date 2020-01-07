@@ -166,7 +166,7 @@ namespace MinvoiceWebService.Services
                         }
                         JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                         var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                        var dataRequest = jObjectMinvoice.ToString();
+                        var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
                         var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                         var rs = webClient.UploadString(url, dataRequest);
                         var dataResponse = JObject.Parse(rs);
@@ -974,7 +974,7 @@ namespace MinvoiceWebService.Services
 
                         JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                         var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UserCreateInvoiceIPos}";
-                        var dataRequest = jObjectMinvoice.ToString();
+                        var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
                         var webClient = LoginService.SetupWebClientIPos(mst, token);
                         var rs = webClient.UploadString(url, dataRequest);
                         var dataResponse = JObject.Parse(rs);
@@ -1167,7 +1167,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSubstituteInvoice}";
-                            var dataRequest = jObjectMinvoice.ToString();
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
