@@ -55,7 +55,7 @@ namespace MinvoiceWebService.Services
                     customer.dmdt_id = dmdtId;
                     customer.dt_me_id = dtMeId;
                     var customerJObject = CustomerJsonConvert.CreateJObjetcCustomer(customer, !string.IsNullOrEmpty(code));
-                    string dataRequest = customerJObject.ToString();
+                    string dataRequest = customerJObject.ToString().Replace("&amp;", "&");
                     try
                     {
                         try

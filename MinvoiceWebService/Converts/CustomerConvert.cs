@@ -10,6 +10,7 @@ namespace MinvoiceWebService.Converts
         private static XmlDocument _xmlDocument;
         public static List<Customer> GetCustomers(string url)
         {
+            url = url.Replace("&", "&amp;");
             _xmlDocument = new XmlDocument();
             List<Customer> customers = new List<Customer>();
             try
