@@ -28,6 +28,8 @@ namespace MinvoiceWebService.Services
                 SignType = signType,
                 InvInvoiceCodeId = ApiService.GetInvInvoiceCodeId(mst, userName, passWord, mauSo, kyHieu)
             };
+
+
             return dataRequestObject;
         }
 
@@ -122,6 +124,9 @@ namespace MinvoiceWebService.Services
                         dataRequestObject.InvOriginalId = jArrayInvoice[0]["inv_InvoiceAuth_id"].ToString();
                         // Gán trạng thái cho hóa đơn điều chỉnh
                         dataRequestObject.TypeOfInvoice = typeOfAdjustment == 1 ? 19 : typeOfAdjustment == 2 ? 21 : typeOfAdjustment == 3 ? 5 : 3;
+                        dataRequestObject.TypeOfInvoiceParent = typeOfAdjustment == 1 ? 11 :
+                            typeOfAdjustment == 2 ? 11 :
+                            typeOfAdjustment == 3 ? 11 : 17;
                     }
                     else
                     {
@@ -184,6 +189,13 @@ namespace MinvoiceWebService.Services
                                 jObjectResult.Add($"OK_{dataRequestObject.InvoiceNumber};{jArrayInvoice[0]["trang_thai_hd"]}_{trangThaiKy}", (dataRequestObject.TypeUpdate == 2 ? "Điều chỉnh" : "Cập nhật") + ($" hóa đơn số {dataRequestObject.InvoiceNumber} thành công. "));
                                 if (typeUpdate == 2)
                                 {
+
+                                    var sqlUpdate =
+                                        $"UPDATE dbo.inv_InvoiceAuth SET trang_thai_hd = {dataRequestObject.TypeOfInvoiceParent}, inv_adjustmentType =  {dataRequestObject.TypeOfInvoiceParent} WHERE inv_InvoiceAuth_id = '{dataRequestObject.InvOriginalId}' ";
+                                    var urlExecuteQuery = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlExecuteQuery}{sqlUpdate}";
+
+                                    var a = webClient.DownloadString(urlExecuteQuery);
+
                                     jObjectResult.Add($"OK_NEW;{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKyNew}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu_{dataResponse["data"]["sobaomat"]}");
                                 }
                             }
@@ -299,7 +311,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&"); 
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -371,7 +383,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&"); 
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -445,7 +457,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddSignApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&"); 
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -504,7 +516,7 @@ namespace MinvoiceWebService.Services
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
                             var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddSseApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&"); 
+                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
                             var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
                             var rs = webClient.UploadString(url, dataRequest);
                             var dataResponse = JObject.Parse(rs);
@@ -1070,7 +1082,7 @@ namespace MinvoiceWebService.Services
 
 
         // Cập nhật 2019-10-25
-        public static string SignInvoices(string mst, string userName, string passWord , string listId)
+        public static string SignInvoices(string mst, string userName, string passWord, string listId)
         {
             var json = new JObject();
             try
@@ -1127,7 +1139,7 @@ namespace MinvoiceWebService.Services
                 return jObjectResult.ToString();
             }
 
-            DataRequestObject dataRequestObject = SetupDataRequestObject(mst, userName, passWord, mauSo, kyHieu, "", xml, opt, null, typeOfInvoice, typeUpdate);
+            DataRequestObject dataRequestObject = SetupDataRequestObject(mst, userName, passWord, mauSo, kyHieu, "", xml, opt, null, 3, typeUpdate);
             dataRequestObject.InvOriginalId = idOfInvoiceAdjment;
             try
             {
@@ -1179,6 +1191,12 @@ namespace MinvoiceWebService.Services
                             {
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
+                                    var sqlUpdate =
+                                        $"UPDATE dbo.inv_InvoiceAuth SET trang_thai_hd = 17, inv_adjustmentType = 17 WHERE inv_InvoiceAuth_id = '{idOfInvoiceAdjment}' ";
+                                    var urlExecuteQuery = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlExecuteQuery}{sqlUpdate}";
+
+                                    var a = webClient.DownloadString(urlExecuteQuery);
+
                                     var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                     jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
                                 }

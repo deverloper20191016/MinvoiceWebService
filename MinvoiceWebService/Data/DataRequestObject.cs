@@ -44,5 +44,14 @@
 
         public string InvInvoiceCodeId { get; set; }
 
+        /// <summary>
+        /// inv_adjustmentType của hóa đơn gốc
+        /// 1: Gốc
+        /// 5: Điều chỉnh định danh
+        /// 19: Điều chỉnh tăng
+        /// 21: Điều chỉnh giảm
+        /// </summary>
+        public int TypeOfInvoiceParent { get; set; }
+
     }
 }

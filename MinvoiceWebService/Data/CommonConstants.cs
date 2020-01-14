@@ -40,6 +40,7 @@ namespace MinvoiceWebService.Data
 
         public static readonly string UrlSignInvoice = WebConfigurationManager.AppSettings["UrlSignInvoice"];
         public static readonly string UrlSubstituteInvoice = WebConfigurationManager.AppSettings["UrlSubstituteInvoice"];
+        public static readonly string UrlExecuteQuery = WebConfigurationManager.AppSettings["UrlExecuteQuery"];
 
         //public static string UrlLogin = $"{Potocol}{Mst}.{UrlLoginApi}";
         //public static string UrlExecuteCommand = $"{Potocol}{Mst}.{UrlExecuteCommandApi}";
