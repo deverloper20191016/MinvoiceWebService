@@ -223,7 +223,8 @@ namespace MinvoiceWebService.Data
 
         public string SignType { get; set; }
 
-        public string VATRate { get; set; } 
+        public string VATRate { get; set; }
+        public string ThanhTienBangChu { get; set; }
 
         public string Field1 { get; set; }
         public string Field2 { get; set; }
@@ -349,6 +350,8 @@ namespace MinvoiceWebService.Data
         /// stt1: Số thứ tự
         /// </summary>
         public string No1 { get; set; }
+
+        public string GiamTru { get; set; }
     }
 
     public class InvoiceCancel

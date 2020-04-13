@@ -65,6 +65,7 @@ namespace MinvoiceWebService.Converts
                 {"voi_tochuc",invoice.Master.ToChuc },
                 {"inv_vatPercentage",invoice.Master.VATRate },
                 {"key_api",invoice.Master.Key },
+                {"amount_to_word",invoice.Master.ThanhTienBangChu },
 
                 {"field1",invoice.Master.Field1 },
                 {"field2",invoice.Master.Field2 },
@@ -144,6 +145,7 @@ namespace MinvoiceWebService.Converts
                     {"ma_mau",detail.MaMau },
                     {"han_dung",detail.HanDung },
                     {"noi_san_xuat",detail.NoiSanXuat },
+                    {"check_giam_tru",detail.GiamTru },
                 };
                 jArrayData.Add(jObjectData);
             }

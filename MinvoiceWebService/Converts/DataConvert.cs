@@ -215,6 +215,9 @@ namespace MinvoiceWebService.Converts
             master.ToChuc = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("ToChuc")?.InnerText) ? xmlNodeMaster
                 .SelectSingleNode("ToChuc")?.InnerText : null;
 
+            master.ThanhTienBangChu = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("ThanhTienBangChu")?.InnerText) ? xmlNodeMaster
+                .SelectSingleNode("ThanhTienBangChu")?.InnerText : null;
+
             master.Field1 = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("Field1")?.InnerText) ? xmlNodeMaster
                 .SelectSingleNode("Field1")?.InnerText : null;
             master.Field2 = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("Field2")?.InnerText) ? xmlNodeMaster
@@ -302,6 +305,9 @@ namespace MinvoiceWebService.Converts
                         : null,
                     No1 = !string.IsNullOrEmpty(xmlNodeListDetail.SelectSingleNode("No1")?.InnerText)
                         ? xmlNodeListDetail.SelectSingleNode("No1")?.InnerText
+                        : null,
+                    GiamTru = !string.IsNullOrEmpty(xmlNodeListDetail.SelectSingleNode("GiamTru")?.InnerText)
+                        ? xmlNodeListDetail.SelectSingleNode("GiamTru")?.InnerText
                         : null,
                 };
 
