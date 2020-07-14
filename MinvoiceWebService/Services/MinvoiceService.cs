@@ -51,7 +51,14 @@ namespace MinvoiceWebService.Services
                     json.Add("mau_so", jObject["mau_hd"]);
                     json.Add("ky_hieu", jObject["inv_invoiceSeries"]);
 
+
+
                     var trangThaiKy = jObject["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : jObject["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+
+                    if (trangThaiKy != 1)
+                    {
+                        json.Add("sobaomat", jObject["sobaomat"]);
+                    }
 
                     JObject result = new JObject
                     {
@@ -266,7 +273,7 @@ namespace MinvoiceWebService.Services
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
                                     var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
-                                    jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
+                                    jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{dataResponse["data"]["inv_InvoiceAuth_id"]}_{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
                                 }
                             }
                         }
