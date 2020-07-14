@@ -116,7 +116,7 @@ namespace MinvoiceWebService
         {
             string xmlConvertByTypeFont = Converter.ConvertToFont(typeFont, xml);
 
-            var resutl = MinvoiceService.CreateInvoice(mst, userName, passWord, mauSo, kyHieu, "", xmlConvertByTypeFont, false);
+            var resutl = MinvoiceService.CreateInvoice(mst, userName, passWord, mauSo, kyHieu, "", xmlConvertByTypeFont, false, 1);
             return resutl;
         }
 

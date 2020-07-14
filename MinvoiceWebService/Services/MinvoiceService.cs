@@ -232,7 +232,7 @@ namespace MinvoiceWebService.Services
         /// <param name="typeOfInvoice">inv_adjustmentType của hóa đơn</param>
         /// <param name="typeUpdate"></param>
         /// <returns></returns>
-        public static string CreateInvoice(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int typeOfInvoice = 1, int typeUpdate = 1)
+        public static string CreateInvoice(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int typeOfInvoice = 1, int typeUpdate = 1, int useConverFont = 0)
         {
             JObject jObjectResult = new JObject();
 
@@ -273,7 +273,17 @@ namespace MinvoiceWebService.Services
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
                                     var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
-                                    jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{dataResponse["data"]["inv_InvoiceAuth_id"]}_{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
+
+                                    if (useConverFont == 1)
+                                    {
+                                        jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{dataResponse["data"]["inv_InvoiceAuth_id"]}_{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
+                                    }
+                                    else
+                                    {
+                                        jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
+                                    }
+
+
                                 }
                             }
                         }
@@ -945,15 +955,25 @@ namespace MinvoiceWebService.Services
                 };
 
                 var rs = webClient.UploadString(url, data.ToString());
-                var result = JArray.Parse(rs);
-                if (result.Count > 0)
+                var response = JObject.Parse(rs);
+                if (response.ContainsKey("error"))
                 {
-                    json.Add("OK", result);
+                    json.Add("ERROR", response["error"]);
                 }
                 else
                 {
-                    json.Add("ERROR", "Không tìm thấy hóa đơn");
+                    var result = (JArray)(response["data"]);
+                    if (result.Count > 0)
+                    {
+                        json.Add("OK", result);
+                    }
+                    else
+                    {
+                        json.Add("ERROR", "Không tìm thấy hóa đơn");
+                    }
+
                 }
+
 
                 return json.ToString();
             }
