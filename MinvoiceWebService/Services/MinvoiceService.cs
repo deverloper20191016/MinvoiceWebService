@@ -1,10 +1,10 @@
-﻿using System;
+﻿using MinvoiceWebService.Converts;
+using MinvoiceWebService.Data;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using MinvoiceWebService.Converts;
-using MinvoiceWebService.Data;
-using Newtonsoft.Json.Linq;
 
 namespace MinvoiceWebService.Services
 {
@@ -42,7 +42,7 @@ namespace MinvoiceWebService.Services
                 JArray jArrayInvoice = ApiService.GetInvoice(userName, passWord, kyHieu, mauSo, invoiceNumber, mst);
                 if (jArrayInvoice.Count > 0)
                 {
-                    var jObject = jArrayInvoice[0];
+                    JToken jObject = jArrayInvoice[0];
                     json.Add("id", jObject["inv_InvoiceAuth_id"]);
                     json.Add("inv_invoiceNumber", jObject["inv_invoiceNumber"]);
                     json.Add("key", jObject["so_benh_an"]);
@@ -53,7 +53,7 @@ namespace MinvoiceWebService.Services
 
 
 
-                    var trangThaiKy = jObject["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : jObject["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                    int trangThaiKy = jObject["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : jObject["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
 
                     if (trangThaiKy != 1)
                     {
@@ -93,7 +93,7 @@ namespace MinvoiceWebService.Services
         /// <param name="opt"></param>
         /// <param name="typeOfInvoice">Trường inv_adjustmentType của hóa đơn</param>
         /// <param name="typeUpdate">Loại update. 2: Điều chỉnh, 1: Cập nhật hoặc thêm mới</param>
-        /// <param name="typeOfAdjustment">Loại điều chỉnh. 1: Tăng, 2: Giảm, 3: Định danh, 4: Thay thế</param>
+        /// <param name="typeOfAdjustment">Loại điều chỉnh. 1: Tăng, 2: Giảm, 3: Định danh, 4: Thay thế, 5: Tăng/Giảm</param>
         /// <returns></returns>
         public static string UpdateInvoice(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber, string xml, bool opt, int typeOfInvoice = 1, int typeUpdate = 1, int typeOfAdjustment = 1)
         {
@@ -130,10 +130,10 @@ namespace MinvoiceWebService.Services
                         // Lấy Id của hóa đơn gốc
                         dataRequestObject.InvOriginalId = jArrayInvoice[0]["inv_InvoiceAuth_id"].ToString();
                         // Gán trạng thái cho hóa đơn điều chỉnh
-                        dataRequestObject.TypeOfInvoice = typeOfAdjustment == 1 ? 19 : typeOfAdjustment == 2 ? 21 : typeOfAdjustment == 3 ? 5 : 3;
+                        dataRequestObject.TypeOfInvoice = typeOfAdjustment == 1 ? 19 : typeOfAdjustment == 2 ? 21 : typeOfAdjustment == 3 ? 5 : typeOfAdjustment == 4 ? 3 : 23;
                         dataRequestObject.TypeOfInvoiceParent = typeOfAdjustment == 1 ? 11 :
                             typeOfAdjustment == 2 ? 11 :
-                            typeOfAdjustment == 3 ? 11 : 17;
+                            typeOfAdjustment == 3 ? 11 : typeOfAdjustment == 4 ? 17 : 11;
                     }
                     else
                     {
@@ -157,7 +157,7 @@ namespace MinvoiceWebService.Services
 
                 if (invoices.Count > 0)
                 {
-                    foreach (var invoice in invoices)
+                    foreach (Invoice invoice in invoices)
                     {
 
 
@@ -177,11 +177,11 @@ namespace MinvoiceWebService.Services
 
                         }
                         JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
-                        var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                        var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
-                        var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
-                        var rs = webClient.UploadString(url, dataRequest);
-                        var dataResponse = JObject.Parse(rs);
+                        string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
+                        string dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
+                        WebClient webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
+                        string rs = webClient.UploadString(url, dataRequest);
+                        JObject dataResponse = JObject.Parse(rs);
 
                         if (dataResponse.ContainsKey("error"))
                         {
@@ -191,17 +191,17 @@ namespace MinvoiceWebService.Services
                         {
                             if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                             {
-                                var trangThaiKy = jArrayInvoice[0]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : jArrayInvoice[0]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
-                                var trangThaiKyNew = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                int trangThaiKy = jArrayInvoice[0]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : jArrayInvoice[0]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                int trangThaiKyNew = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                 jObjectResult.Add($"OK_{dataRequestObject.InvoiceNumber};{jArrayInvoice[0]["trang_thai_hd"]}_{trangThaiKy}", (dataRequestObject.TypeUpdate == 2 ? "Điều chỉnh" : "Cập nhật") + ($" hóa đơn số {dataRequestObject.InvoiceNumber} thành công. "));
                                 if (typeUpdate == 2)
                                 {
 
-                                    var sqlUpdate =
+                                    string sqlUpdate =
                                         $"UPDATE dbo.inv_InvoiceAuth SET trang_thai_hd = {dataRequestObject.TypeOfInvoiceParent}, inv_adjustmentType =  {dataRequestObject.TypeOfInvoiceParent} WHERE inv_InvoiceAuth_id = '{dataRequestObject.InvOriginalId}' ";
-                                    var urlExecuteQuery = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlExecuteQuery}{sqlUpdate}";
+                                    string urlExecuteQuery = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlExecuteQuery}{sqlUpdate}";
 
-                                    var a = webClient.DownloadString(urlExecuteQuery);
+                                    string a = webClient.DownloadString(urlExecuteQuery);
 
                                     jObjectResult.Add($"OK_NEW;{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKyNew}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu_{dataResponse["data"]["sobaomat"]}");
                                 }
@@ -249,7 +249,7 @@ namespace MinvoiceWebService.Services
 
                 if (invoices.Count > 0)
                 {
-                    foreach (var invoice in invoices)
+                    foreach (Invoice invoice in invoices)
                     {
                         JArray jArrayInvoice = ApiService.GetInvoiceByKey(dataRequestObject.Username, dataRequestObject.Password, dataRequestObject.KyHieu, dataRequestObject.MauSo, invoice.Master.Key, mst);
                         if (jArrayInvoice.Count > 0)
@@ -259,11 +259,11 @@ namespace MinvoiceWebService.Services
                         else
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
-                            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
-                            var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
-                            var rs = webClient.UploadString(url, dataRequest);
-                            var dataResponse = JObject.Parse(rs);
+                            string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
+                            string dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
+                            WebClient webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
+                            string rs = webClient.UploadString(url, dataRequest);
+                            JObject dataResponse = JObject.Parse(rs);
                             if (dataResponse.ContainsKey("error"))
                             {
                                 jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
@@ -272,7 +272,7 @@ namespace MinvoiceWebService.Services
                             {
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
-                                    var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                    int trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
 
                                     if (useConverFont == 1)
                                     {
@@ -317,7 +317,7 @@ namespace MinvoiceWebService.Services
 
                 if (invoices.Count > 0)
                 {
-                    foreach (var invoice in invoices)
+                    foreach (Invoice invoice in invoices)
                     {
                         JArray jArrayInvoice = ApiService.GetInvoiceByKey(dataRequestObject.Username, dataRequestObject.Password, dataRequestObject.KyHieu, dataRequestObject.MauSo, invoice.Master.Key, mst);
                         if (jArrayInvoice.Count > 0)
@@ -327,11 +327,11 @@ namespace MinvoiceWebService.Services
                         else
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
-                            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
-                            var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
-                            var rs = webClient.UploadString(url, dataRequest);
-                            var dataResponse = JObject.Parse(rs);
+                            string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
+                            string dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
+                            WebClient webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
+                            string rs = webClient.UploadString(url, dataRequest);
+                            JObject dataResponse = JObject.Parse(rs);
                             if (dataResponse.ContainsKey("error"))
                             {
                                 jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
@@ -340,7 +340,7 @@ namespace MinvoiceWebService.Services
                             {
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
-                                    var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                    int trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                     jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}+{dataResponse["data"]["inv_invoiceNumber"]}");
                                 }
                             }
@@ -389,7 +389,7 @@ namespace MinvoiceWebService.Services
 
                 if (invoices.Count > 0)
                 {
-                    foreach (var invoice in invoices)
+                    foreach (Invoice invoice in invoices)
                     {
                         JArray jArrayInvoice = ApiService.GetInvoiceByKey(dataRequestObject.Username, dataRequestObject.Password, dataRequestObject.KyHieu, dataRequestObject.MauSo, invoice.Master.Key, mst);
                         if (jArrayInvoice.Count > 0)
@@ -399,11 +399,11 @@ namespace MinvoiceWebService.Services
                         else
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
-                            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
-                            var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
-                            var rs = webClient.UploadString(url, dataRequest);
-                            var dataResponse = JObject.Parse(rs);
+                            string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddApi}";
+                            string dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
+                            WebClient webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
+                            string rs = webClient.UploadString(url, dataRequest);
+                            JObject dataResponse = JObject.Parse(rs);
                             if (dataResponse.ContainsKey("error"))
                             {
                                 jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
@@ -412,7 +412,7 @@ namespace MinvoiceWebService.Services
                             {
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
-                                    var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                    int trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                     jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu{dataResponse["data"]["sobaomat"]}");
                                 }
                             }
@@ -463,7 +463,7 @@ namespace MinvoiceWebService.Services
 
                 if (invoices.Count > 0)
                 {
-                    foreach (var invoice in invoices)
+                    foreach (Invoice invoice in invoices)
                     {
                         JArray jArrayInvoice = ApiService.GetInvoiceByKey(dataRequestObject.Username, dataRequestObject.Password, dataRequestObject.KyHieu, dataRequestObject.MauSo, invoice.Master.Key, mst);
                         if (jArrayInvoice.Count > 0)
@@ -473,11 +473,11 @@ namespace MinvoiceWebService.Services
                         else
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
-                            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddSignApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
-                            var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
-                            var rs = webClient.UploadString(url, dataRequest);
-                            var dataResponse = JObject.Parse(rs);
+                            string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddSignApi}";
+                            string dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
+                            WebClient webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
+                            string rs = webClient.UploadString(url, dataRequest);
+                            JObject dataResponse = JObject.Parse(rs);
                             if (dataResponse.ContainsKey("error"))
                             {
                                 jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
@@ -486,7 +486,7 @@ namespace MinvoiceWebService.Services
                             {
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
-                                    var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                    int trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                     jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]};MaTraCuu_{dataResponse["data"]["sobaomat"]}");
                                 }
                             }
@@ -522,7 +522,7 @@ namespace MinvoiceWebService.Services
 
                 if (invoices.Count > 0)
                 {
-                    foreach (var invoice in invoices)
+                    foreach (Invoice invoice in invoices)
                     {
                         JArray jArrayInvoice = ApiService.GetInvoiceByKey(dataRequestObject.Username, dataRequestObject.Password, dataRequestObject.KyHieu, dataRequestObject.MauSo, invoice.Master.Key, mst);
                         if (jArrayInvoice.Count > 0)
@@ -532,11 +532,11 @@ namespace MinvoiceWebService.Services
                         else
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
-                            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddSseApi}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
-                            var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
-                            var rs = webClient.UploadString(url, dataRequest);
-                            var dataResponse = JObject.Parse(rs);
+                            string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlAddSseApi}";
+                            string dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
+                            WebClient webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
+                            string rs = webClient.UploadString(url, dataRequest);
+                            JObject dataResponse = JObject.Parse(rs);
                             if (dataResponse.ContainsKey("error"))
                             {
                                 jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
@@ -545,7 +545,7 @@ namespace MinvoiceWebService.Services
                             {
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
-                                    var trangThaiKy = dataResponse["data"][0]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"][0]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                    int trangThaiKy = dataResponse["data"][0]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"][0]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                     jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"][0]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"][0]["inv_invoiceNumber"]}");
                                 }
                             }
@@ -572,17 +572,17 @@ namespace MinvoiceWebService.Services
 
             try
             {
-                var invoiceCancels = DataConvert.GetInvoiceCancels(xmlData);
-                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlDeleteInvoiceApi}";
+                List<InvoiceCancel> invoiceCancels = DataConvert.GetInvoiceCancels(xmlData);
+                string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlDeleteInvoiceApi}";
 
-                foreach (var invoiceCancel in invoiceCancels)
+                foreach (InvoiceCancel invoiceCancel in invoiceCancels)
                 {
-                    var jArrayInvoiceAuth = ApiService.GetInvoice(userName, passWord, invoiceCancel.InvSerial, invoiceCancel.InvPattern, invoiceCancel.InvNumber, mst);
+                    JArray jArrayInvoiceAuth = ApiService.GetInvoice(userName, passWord, invoiceCancel.InvSerial, invoiceCancel.InvPattern, invoiceCancel.InvNumber, mst);
 
                     if (jArrayInvoiceAuth.Count > 0)
                     {
-                        var invoiceAuthId = jArrayInvoiceAuth[0]["inv_InvoiceAuth_id"].ToString();
-                        var jObject = new JObject
+                        string invoiceAuthId = jArrayInvoiceAuth[0]["inv_InvoiceAuth_id"].ToString();
+                        JObject jObject = new JObject
                         {
                             {"inv_InvoiceAuth_id", invoiceAuthId},
                             {"sovb", invoiceCancel.SoVb},
@@ -591,8 +591,8 @@ namespace MinvoiceWebService.Services
                         };
                         try
                         {
-                            var webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                            var rs = webClient.UploadString(url, jObject.ToString());
+                            WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                            string rs = webClient.UploadString(url, jObject.ToString());
                             JObject jObjectRs = JObject.Parse(rs);
                             if (jObjectRs.ContainsKey("ok"))
                             {
@@ -643,8 +643,8 @@ namespace MinvoiceWebService.Services
             }
             try
             {
-                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceNumberByDate}";
+                WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceNumberByDate}";
                 JObject data = new JObject
             {
                 {"tu_ngay", tuNgay },
@@ -654,18 +654,18 @@ namespace MinvoiceWebService.Services
             };
 
                 string result = webClient.UploadString(url, data.ToString());
-                var response = JObject.Parse(result);
+                JObject response = JObject.Parse(result);
 
 
                 if (response.ContainsKey("data"))
                 {
-                    var dataResponse = JArray.FromObject(response["data"]);
+                    JArray dataResponse = JArray.FromObject(response["data"]);
                     if (dataResponse.Count > 0)
                     {
                         JArray jArrayItem = new JArray();
                         foreach (JToken token in dataResponse)
                         {
-                            var trangThaiKy = token["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : token["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                            int trangThaiKy = token["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : token["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                             JObject jObjectItem = new JObject
                             {
                                 {"inv_InvoiceAuth_id", token["inv_InvoiceAuth_id"] },
@@ -706,9 +706,9 @@ namespace MinvoiceWebService.Services
             try
             {
                 WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                var url =
+                string url =
                     $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInfo}?invoiceCode={mauSo}&invoiceSeries={kyHieu}&invoiceNumber={invoiceNumber}";
-                var response = webClient.DownloadString(url);
+                string response = webClient.DownloadString(url);
                 if (!string.IsNullOrEmpty(response))
                 {
                     JObject jObject = JObject.Parse(response);
@@ -716,8 +716,8 @@ namespace MinvoiceWebService.Services
                     {
                         if (jObject.ContainsKey("inv_InvoiceAuth_id"))
                         {
-                            var invInvoiceAuthId = jObject["inv_InvoiceAuth_id"].ToString();
-                            var urlPdf =
+                            string invInvoiceAuthId = jObject["inv_InvoiceAuth_id"].ToString();
+                            string urlPdf =
                                 $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlPreviewPdf}?id={invInvoiceAuthId}";
                             json.Add($"OK_{invoiceNumber}", urlPdf);
                             return json.ToString();
@@ -764,7 +764,7 @@ namespace MinvoiceWebService.Services
                 if (jObject.ContainsKey($"OK_{invoiceNumber}"))
                 {
                     HttpClient client = LoginService.SetupHttpClient(userName, passWord, mst);
-                    var bytes = client.GetAsync(jObject[$"OK_{invoiceNumber}"].ToString()).Result.Content
+                    byte[] bytes = client.GetAsync(jObject[$"OK_{invoiceNumber}"].ToString()).Result.Content
                         .ReadAsByteArrayAsync().Result;
                     string result = Convert.ToBase64String(bytes);
                     JObject json = new JObject
@@ -793,14 +793,14 @@ namespace MinvoiceWebService.Services
         // Cập nhật ngày 2019-10-23
         public static string GetTbph(string mst, string userName, string passWord)
         {
-            var json = new JObject();
+            JObject json = new JObject();
             try
             {
-                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetTbph}";
+                WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetTbph}";
 
-                var rs = webClient.DownloadString(url);
-                var result = JArray.Parse(rs);
+                string rs = webClient.DownloadString(url);
+                JArray result = JArray.Parse(rs);
                 if (result.Count > 0)
                 {
                     json.Add("OK", result);
@@ -824,7 +824,7 @@ namespace MinvoiceWebService.Services
             JObject json = new JObject();
             try
             {
-                var invoice = ApiService.GetInvoiceById(userName, passWord, mst, id);
+                JObject invoice = ApiService.GetInvoiceById(userName, passWord, mst, id);
                 if (invoice.ContainsKey("error"))
                 {
                     json.Add("ERROR", invoice["error"].ToString());
@@ -838,10 +838,10 @@ namespace MinvoiceWebService.Services
                 json.Add("trang_thai_hd", invoice["trang_thai_hd"]);
                 json.Add("mau_so", invoice["mau_hd"]);
                 json.Add("ky_hieu", invoice["inv_invoiceSeries"]);
-                var trangThaiKy = invoice["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : invoice["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                int trangThaiKy = invoice["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : invoice["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                 json.Add("trang_thai_ky", trangThaiKy);
 
-                var result = new JObject
+                JObject result = new JObject
                 {
                     {$"OK_{id}", json}
                 };
@@ -857,10 +857,10 @@ namespace MinvoiceWebService.Services
 
         public static string GetListInvoice(string mst, string userName, string passWord, string listId)
         {
-            var json = new JObject();
+            JObject json = new JObject();
             try
             {
-                var data = ApiService.GetListInvoice(userName, passWord, mst, listId);
+                JObject data = ApiService.GetListInvoice(userName, passWord, mst, listId);
                 if (data.ContainsKey("error"))
                 {
                     json.Add("ERROR", data["error"]);
@@ -878,14 +878,14 @@ namespace MinvoiceWebService.Services
 
         public static string GetInvoiceBravoByKeyApi(string mst, string userName, string passWord, string keyBravo)
         {
-            var json = new JObject();
+            JObject json = new JObject();
             try
             {
-                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceByKeyApiBravo}{keyBravo}";
+                WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceByKeyApiBravo}{keyBravo}";
 
-                var rs = webClient.DownloadString(url);
-                var result = JObject.Parse(rs);
+                string rs = webClient.DownloadString(url);
+                JObject result = JObject.Parse(rs);
 
                 if (result.ContainsKey("Inv_InvoiceAuth_id"))
                 {
@@ -907,19 +907,19 @@ namespace MinvoiceWebService.Services
 
         public static string GetInvoiceBravoByFKey(string mst, string userName, string passWord, string fKey)
         {
-            var json = new JObject();
+            JObject json = new JObject();
             try
             {
-                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceFkeyApiBravo}";
+                WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceFkeyApiBravo}";
 
-                var data = new JObject
+                JObject data = new JObject
                 {
                     {"data", fKey}
                 };
 
-                var rs = webClient.UploadString(url, data.ToString());
-                var result = JObject.Parse(rs);
+                string rs = webClient.UploadString(url, data.ToString());
+                JObject result = JObject.Parse(rs);
                 if (result.ContainsKey("data"))
                 {
                     json.Add("OK", result);
@@ -940,13 +940,13 @@ namespace MinvoiceWebService.Services
 
         public static string GetInvoiceBravoByDate(string mst, string userName, string passWord, string kyHieu, string mauSo, string tuNgay, string denNgay)
         {
-            var json = new JObject();
+            JObject json = new JObject();
             try
             {
-                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceByDateApiBravo}";
+                WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlGetInvoiceByDateApiBravo}";
 
-                var data = new JObject
+                JObject data = new JObject
                 {
                     {"tu_ngay", tuNgay},
                     {"den_ngay", denNgay},
@@ -954,15 +954,15 @@ namespace MinvoiceWebService.Services
                     {"mau_so", mauSo},
                 };
 
-                var rs = webClient.UploadString(url, data.ToString());
-                var response = JObject.Parse(rs);
+                string rs = webClient.UploadString(url, data.ToString());
+                JObject response = JObject.Parse(rs);
                 if (response.ContainsKey("error"))
                 {
                     json.Add("ERROR", response["error"]);
                 }
                 else
                 {
-                    var result = (JArray)(response["data"]);
+                    JArray result = (JArray)(response["data"]);
                     if (result.Count > 0)
                     {
                         json.Add("OK", result);
@@ -1003,7 +1003,7 @@ namespace MinvoiceWebService.Services
 
                 if (invoices.Count > 0)
                 {
-                    foreach (var invoice in invoices)
+                    foreach (Invoice invoice in invoices)
                     {
                         if (string.IsNullOrEmpty(invoice.Master.Key))
                         {
@@ -1012,11 +1012,11 @@ namespace MinvoiceWebService.Services
                         }
 
                         JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
-                        var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UserCreateInvoiceIPos}";
-                        var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
-                        var webClient = LoginService.SetupWebClientIPos(mst, token);
-                        var rs = webClient.UploadString(url, dataRequest);
-                        var dataResponse = JObject.Parse(rs);
+                        string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UserCreateInvoiceIPos}";
+                        string dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
+                        WebClient webClient = LoginService.SetupWebClientIPos(mst, token);
+                        string rs = webClient.UploadString(url, dataRequest);
+                        JObject dataResponse = JObject.Parse(rs);
                         if (dataResponse.ContainsKey("error"))
                         {
                             jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
@@ -1025,7 +1025,7 @@ namespace MinvoiceWebService.Services
                         {
                             if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                             {
-                                var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                int trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                 jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
                             }
                         }
@@ -1044,10 +1044,10 @@ namespace MinvoiceWebService.Services
 
         public static string DeleteInvoice(string mst, string userName, string passWord, string id)
         {
-            var json = new JObject();
+            JObject json = new JObject();
             try
             {
-                var invoiceSearch = ApiService.GetInvoiceById(userName, passWord, mst, id);
+                JObject invoiceSearch = ApiService.GetInvoiceById(userName, passWord, mst, id);
 
                 if (invoiceSearch.ContainsKey("error"))
                 {
@@ -1055,7 +1055,7 @@ namespace MinvoiceWebService.Services
                     return json.ToString();
                 }
 
-                var status = invoiceSearch["trang_thai"].ToString();
+                string status = invoiceSearch["trang_thai"].ToString();
                 if (status.Equals(CommonConstants.DaKy) || status.Equals(CommonConstants.ChoNguoiMuaKy) ||
                     status.Equals(CommonConstants.NguoiMuaDaKy))
                 {
@@ -1065,14 +1065,14 @@ namespace MinvoiceWebService.Services
 
                 }
 
-                var jArray = new JArray();
-                var a = new JObject
+                JArray jArray = new JArray();
+                JObject a = new JObject
                 {
                     {"inv_InvoiceAuth_id", id}
                 };
                 jArray.Add(a);
 
-                var dataRequest = new JObject
+                JObject dataRequest = new JObject
                 {
                     {"windowid", "WIN00187"},
                     {"editmode", 3},
@@ -1080,11 +1080,11 @@ namespace MinvoiceWebService.Services
                         "data", jArray
                     }
                 };
-                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSaveApi}";
+                string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSaveApi}";
 
-                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                var rs = webClient.UploadString(url, dataRequest.ToString());
-                var dataResponse = JObject.Parse(rs);
+                WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                string rs = webClient.UploadString(url, dataRequest.ToString());
+                JObject dataResponse = JObject.Parse(rs);
 
                 if (dataResponse.ContainsKey("error"))
                 {
@@ -1093,8 +1093,11 @@ namespace MinvoiceWebService.Services
                 }
 
                 if (dataResponse.ContainsKey("ok"))
+                {
                     json.Add($"OK_DELETE_{id}",
                         $"Xóa hóa đơn có Id: {id} thành công");
+                }
+
                 return json.ToString();
             }
             catch (Exception ex)
@@ -1111,36 +1114,36 @@ namespace MinvoiceWebService.Services
         // Cập nhật 2019-10-25
         public static string SignInvoices(string mst, string userName, string passWord, string listId)
         {
-            var json = new JObject();
+            JObject json = new JObject();
             try
             {
-                var listIdSign = listId.Split(',');
-                var array = new JArray();
-                foreach (var id in listIdSign)
+                string[] listIdSign = listId.Split(',');
+                JArray array = new JArray();
+                foreach (string id in listIdSign)
                 {
-                    var item = new JObject
+                    JObject item = new JObject
                     {
                         {"inv_InvoiceAuth_id", id}
                     };
                     array.Add(item);
                 }
 
-                var data = new JObject
+                JObject data = new JObject
                 {
                     {"data", array }
                 };
 
-                var dataRequest = data.ToString();
-                var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSignInvoice}";
-                var webClient = LoginService.SetupWebClient(userName, passWord, mst);
-                var rs = webClient.UploadString(url, dataRequest);
-                var dataResponse = JObject.Parse(rs);
+                string dataRequest = data.ToString();
+                string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSignInvoice}";
+                WebClient webClient = LoginService.SetupWebClient(userName, passWord, mst);
+                string rs = webClient.UploadString(url, dataRequest);
+                JObject dataResponse = JObject.Parse(rs);
                 if (dataResponse.ContainsKey("error"))
                 {
                     json.Add("ERROR_SIGN", dataResponse["error"]);
                     return json.ToString();
                 }
-                var count = JArray.Parse(dataResponse["data"].ToString()).Count;
+                int count = JArray.Parse(dataResponse["data"].ToString()).Count;
                 if (count > 0)
                 {
                     json.Add("OK_SIGN", dataResponse);
@@ -1174,7 +1177,7 @@ namespace MinvoiceWebService.Services
 
                 if (invoices.Count > 0)
                 {
-                    foreach (var invoice in invoices)
+                    foreach (Invoice invoice in invoices)
                     {
                         if (string.IsNullOrEmpty(invoice.Master.NumberOrDucument) || string.IsNullOrEmpty(invoice.Master.DateOrDucument) || string.IsNullOrEmpty(invoice.Master.NoteOfDocument))
                         {
@@ -1183,14 +1186,14 @@ namespace MinvoiceWebService.Services
                         }
 
 
-                        var invoiceSearch = ApiService.GetInvoiceById(userName, passWord, mst, idOfInvoiceAdjment);
+                        JObject invoiceSearch = ApiService.GetInvoiceById(userName, passWord, mst, idOfInvoiceAdjment);
                         if (invoiceSearch.ContainsKey("error"))
                         {
                             jObjectResult.Add($"ERROR", invoiceSearch["error"].ToString());
                             return jObjectResult.ToString();
                         }
 
-                        var trangThai = invoiceSearch["trang_thai"].ToString();
+                        string trangThai = invoiceSearch["trang_thai"].ToString();
                         if (trangThai.Equals(CommonConstants.ChoKy) || trangThai.Equals(CommonConstants.ChoDuyet))
                         {
                             jObjectResult.Add($"ERROR", "Hóa đơn chưa ký không thể thay thế");
@@ -1205,11 +1208,11 @@ namespace MinvoiceWebService.Services
                         else
                         {
                             JObject jObjectMinvoice = JsonConvert.CreateJsonMinvoice(dataRequestObject, invoice);
-                            var url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSubstituteInvoice}";
-                            var dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
-                            var webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
-                            var rs = webClient.UploadString(url, dataRequest);
-                            var dataResponse = JObject.Parse(rs);
+                            string url = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlSubstituteInvoice}";
+                            string dataRequest = jObjectMinvoice.ToString().Replace("&amp;", "&");
+                            WebClient webClient = LoginService.SetupWebClient(dataRequestObject.Username, dataRequestObject.Password, mst);
+                            string rs = webClient.UploadString(url, dataRequest);
+                            JObject dataResponse = JObject.Parse(rs);
                             if (dataResponse.ContainsKey("error"))
                             {
                                 jObjectResult.Add($"ERROR_{invoice.Master.Key}", $"Key {invoice.Master.Key}: {dataResponse["error"]} ");
@@ -1218,13 +1221,13 @@ namespace MinvoiceWebService.Services
                             {
                                 if (dataResponse.ContainsKey("ok") && dataResponse.ContainsKey("data"))
                                 {
-                                    var sqlUpdate =
+                                    string sqlUpdate =
                                         $"UPDATE dbo.inv_InvoiceAuth SET trang_thai_hd = 17, inv_adjustmentType = 17 WHERE inv_InvoiceAuth_id = '{idOfInvoiceAdjment}' ";
-                                    var urlExecuteQuery = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlExecuteQuery}{sqlUpdate}";
+                                    string urlExecuteQuery = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlExecuteQuery}{sqlUpdate}";
 
-                                    var a = webClient.DownloadString(urlExecuteQuery);
+                                    string a = webClient.DownloadString(urlExecuteQuery);
 
-                                    var trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
+                                    int trangThaiKy = dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.ChoKy) ? 1 : dataResponse["data"]["trang_thai"].ToString().Contains(CommonConstants.DaKy) ? 2 : 3;
                                     jObjectResult.Add($"OK_{invoice.Master.Key};{dataResponse["data"]["trang_thai_hd"]}_{trangThaiKy}", $"{dataRequestObject.MauSo};{dataRequestObject.KyHieu}-{invoice.Master.Key}_{dataResponse["data"]["inv_invoiceNumber"]}");
                                 }
                             }
