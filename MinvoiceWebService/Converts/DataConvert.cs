@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MinvoiceWebService.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using MinvoiceWebService.Data;
 
 namespace MinvoiceWebService.Converts
 {
@@ -55,7 +55,7 @@ namespace MinvoiceWebService.Converts
                     master.DiscountAmount = 0;
                     master.Total = 0;
 
-                    foreach (var detail in details)
+                    foreach (Detail detail in details)
                     {
                         master.Amount += detail.Amount.GetValueOrDefault(0);
                         master.VatAmount += detail.ProdVatAmount.GetValueOrDefault(0);
@@ -109,14 +109,14 @@ namespace MinvoiceWebService.Converts
                     ? xmlNodeMaster.SelectSingleNode("ArisingDate")?.InnerText
                     : null
             };
-            var totalText = xmlNodeMaster.SelectSingleNode("Total")?.InnerText;
+            string totalText = xmlNodeMaster.SelectSingleNode("Total")?.InnerText;
             if (totalText != null)
             {
                 master.Total = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("Total")?.InnerText)
                     ? double.Parse(totalText)
                     : 0;
             }
-            var discountAmountText = xmlNodeMaster.SelectSingleNode("DiscountAmount")?.InnerText;
+            string discountAmountText = xmlNodeMaster.SelectSingleNode("DiscountAmount")?.InnerText;
             if (discountAmountText != null)
             {
                 master.DiscountAmount =
@@ -125,14 +125,14 @@ namespace MinvoiceWebService.Converts
                         : 0;
             }
 
-            var vatAmountText = xmlNodeMaster.SelectSingleNode("VatAmount")?.InnerText;
+            string vatAmountText = xmlNodeMaster.SelectSingleNode("VatAmount")?.InnerText;
             if (vatAmountText != null)
             {
                 master.VatAmount = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("VatAmount")?.InnerText)
                     ? double.Parse(vatAmountText)
                     : 0;
             }
-            var amountText = xmlNodeMaster.SelectSingleNode("Amount")?.InnerText;
+            string amountText = xmlNodeMaster.SelectSingleNode("Amount")?.InnerText;
             if (amountText != null)
             {
                 master.Amount = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("Amount")?.InnerText)
@@ -309,10 +309,13 @@ namespace MinvoiceWebService.Converts
                     GiamTru = !string.IsNullOrEmpty(xmlNodeListDetail.SelectSingleNode("GiamTru")?.InnerText)
                         ? xmlNodeListDetail.SelectSingleNode("GiamTru")?.InnerText
                         : null,
+                    LoaiDieuChinh = !string.IsNullOrEmpty(xmlNodeListDetail.SelectSingleNode("LoaiDieuChinh")?.InnerText)
+                        ? int.Parse(xmlNodeListDetail.SelectSingleNode("LoaiDieuChinh")?.InnerText)
+                        : (int?)null,
                 };
 
 
-                var prodQuantityText = xmlNodeListDetail.SelectSingleNode("ProdQuantity")?.InnerText;
+                string prodQuantityText = xmlNodeListDetail.SelectSingleNode("ProdQuantity")?.InnerText;
                 if (prodQuantityText != null)
                 {
                     detail.ProdQuantity =
@@ -321,7 +324,7 @@ namespace MinvoiceWebService.Converts
                               : (double?)null;
                 }
 
-                var soLuongThucNhapText = xmlNodeListDetail.SelectSingleNode("SoLuongThucNhap")?.InnerText;
+                string soLuongThucNhapText = xmlNodeListDetail.SelectSingleNode("SoLuongThucNhap")?.InnerText;
                 if (soLuongThucNhapText != null)
                 {
                     detail.SoLuongThucNhap =
@@ -330,7 +333,7 @@ namespace MinvoiceWebService.Converts
                             : (double?)null;
                 }
 
-                var soLuongThucXuatText = xmlNodeListDetail.SelectSingleNode("SoLuongThucXuat")?.InnerText;
+                string soLuongThucXuatText = xmlNodeListDetail.SelectSingleNode("SoLuongThucXuat")?.InnerText;
                 if (soLuongThucXuatText != null)
                 {
                     detail.SoLuongThucXuat =
@@ -341,7 +344,7 @@ namespace MinvoiceWebService.Converts
 
 
 
-                var prodPriceText = xmlNodeListDetail.SelectSingleNode("ProdPrice")?.InnerText;
+                string prodPriceText = xmlNodeListDetail.SelectSingleNode("ProdPrice")?.InnerText;
                 if (prodPriceText != null)
                 {
                     detail.ProdPrice =
@@ -349,14 +352,14 @@ namespace MinvoiceWebService.Converts
                             ? double.Parse(prodPriceText)
                             : (double?)null;
                 }
-                var amountText = xmlNodeListDetail.SelectSingleNode("Amount")?.InnerText;
+                string amountText = xmlNodeListDetail.SelectSingleNode("Amount")?.InnerText;
                 if (amountText != null)
                 {
                     detail.Amount = !string.IsNullOrEmpty(amountText)
                           ? double.Parse(amountText)
                           : (double?)null;
                 }
-                var discountAmountText = xmlNodeListDetail.SelectSingleNode("DiscountAmount")?.InnerText;
+                string discountAmountText = xmlNodeListDetail.SelectSingleNode("DiscountAmount")?.InnerText;
                 if (discountAmountText != null)
                 {
                     detail.DiscountAmount =
@@ -364,7 +367,7 @@ namespace MinvoiceWebService.Converts
                               ? double.Parse(discountAmountText)
                               : (double?)null;
                 }
-                var discountRateText = xmlNodeListDetail.SelectSingleNode("DiscountRate")?.InnerText;
+                string discountRateText = xmlNodeListDetail.SelectSingleNode("DiscountRate")?.InnerText;
                 if (discountRateText != null)
                 {
                     detail.DiscountRate =
@@ -372,7 +375,7 @@ namespace MinvoiceWebService.Converts
                               ? double.Parse(discountRateText)
                               : (double?)null;
                 }
-                var prodVatAmountText = xmlNodeListDetail.SelectSingleNode("ProdVatAmount")?.InnerText;
+                string prodVatAmountText = xmlNodeListDetail.SelectSingleNode("ProdVatAmount")?.InnerText;
                 if (prodVatAmountText != null)
                 {
                     detail.ProdVatAmount =
@@ -380,14 +383,14 @@ namespace MinvoiceWebService.Converts
                               ? double.Parse(prodVatAmountText)
                               : (double?)null;
                 }
-                var prodVatText = xmlNodeListDetail.SelectSingleNode("ProdVat")?.InnerText;
+                string prodVatText = xmlNodeListDetail.SelectSingleNode("ProdVat")?.InnerText;
                 if (prodVatText != null)
                 {
                     detail.ProdVat = !string.IsNullOrEmpty(prodVatText)
                         ? double.Parse(prodVatText)
                         : (double?)null;
                 }
-                var innerText = xmlNodeListDetail.SelectSingleNode("Promotion")?.InnerText;
+                string innerText = xmlNodeListDetail.SelectSingleNode("Promotion")?.InnerText;
                 if (innerText != null)
                 {
                     detail.Promotion =
@@ -395,7 +398,7 @@ namespace MinvoiceWebService.Converts
                             ? int.Parse(innerText)
                             : 0;
                 }
-                var totalAmountText = xmlNodeListDetail.SelectSingleNode("TotalAmount")?.InnerText;
+                string totalAmountText = xmlNodeListDetail.SelectSingleNode("TotalAmount")?.InnerText;
                 if (totalAmountText != null)
                 {
                     detail.TotalAmount =
@@ -417,19 +420,21 @@ namespace MinvoiceWebService.Converts
         {
             _xmlDocument = new XmlDocument();
             _xmlDocument.LoadXml(xmlData);
-            var invoiceCancels = new List<InvoiceCancel>();
+            List<InvoiceCancel> invoiceCancels = new List<InvoiceCancel>();
 
 
-            var invoiceList = _xmlDocument.SelectNodes("Invoices/Inv");
+            XmlNodeList invoiceList = _xmlDocument.SelectNodes("Invoices/Inv");
             if (invoiceList != null)
+            {
                 invoiceCancels.AddRange(from XmlNode node in invoiceList select GetInvoiceCancel(node));
+            }
 
             return invoiceCancels;
         }
 
         public static InvoiceCancel GetInvoiceCancel(XmlNode node)
         {
-            var invoiceCancel = new InvoiceCancel
+            InvoiceCancel invoiceCancel = new InvoiceCancel
             {
                 InvPattern = node.SelectSingleNode("InvPattern")?.InnerText,
                 InvSerial = node.SelectSingleNode("InvSerial")?.InnerText,
@@ -456,7 +461,7 @@ namespace MinvoiceWebService.Converts
             {
                 _xmlDocument.LoadXml(xml);
 
-                var nsmgr = new XmlNamespaceManager(_xmlDocument.NameTable);
+                XmlNamespaceManager nsmgr = new XmlNamespaceManager(_xmlDocument.NameTable);
                 nsmgr.AddNamespace("inv", "http://thaison.vn/inv");
                 nsmgr.AddNamespace("soapenv", "http://schemas.xmlsoap.org/soap/envelope/");
 
@@ -467,8 +472,8 @@ namespace MinvoiceWebService.Converts
                 XmlNode xmlNodeHoaDonEntity = _xmlDocument["soapenv:Envelope"]?["soapenv:Body"]?["XuatHoaDonDienTu"]?["hoaDonEntity"];
                 // _xmlDocument.SelectSingleNode("soapenv:Envelope/soapenv:Body", nsmgr);
 
-                var header = GetHeader(xmlNodeHeader);
-                var hoaDonEntity = GetHoaDonEntity(xmlNodeHoaDonEntity);
+                Header header = GetHeader(xmlNodeHeader);
+                HoaDonEntity hoaDonEntity = GetHoaDonEntity(xmlNodeHoaDonEntity);
 
                 invoices.Header = header;
                 invoices.HoaDonEntity = hoaDonEntity;
@@ -500,7 +505,7 @@ namespace MinvoiceWebService.Converts
         {
             try
             {
-                var hoaDonEntity = GetInfoHoaDonEntity(xmlNodeHoaDonEntity);
+                HoaDonEntity hoaDonEntity = GetInfoHoaDonEntity(xmlNodeHoaDonEntity);
                 XmlNodeList xmlNodeListDetails = xmlNodeHoaDonEntity["HangHoas"]?.ChildNodes;
                 List<HangHoaEntity> hangHoaEntities = GetHangHoaEntities(xmlNodeListDetails);
                 hoaDonEntity.HangHoaEntities = hangHoaEntities;
@@ -680,32 +685,32 @@ namespace MinvoiceWebService.Converts
                     : null,
             };
 
-            var isGiuLaiText = xmlNodeHoaDonEntity["IsGiuLai"]?.InnerText;
+            string isGiuLaiText = xmlNodeHoaDonEntity["IsGiuLai"]?.InnerText;
             hoaDonEntity.IsGiuLai = !string.IsNullOrEmpty(isGiuLaiText) && bool.Parse(isGiuLaiText);
 
-            var isSignText = xmlNodeHoaDonEntity["IsSign"]?.InnerText;
+            string isSignText = xmlNodeHoaDonEntity["IsSign"]?.InnerText;
             hoaDonEntity.IsSign = !string.IsNullOrEmpty(isSignText) && bool.Parse(isSignText);
 
-            var isSuDungBangKeText = xmlNodeHoaDonEntity["isSuDungBangKe"]?.InnerText;
+            string isSuDungBangKeText = xmlNodeHoaDonEntity["isSuDungBangKe"]?.InnerText;
             hoaDonEntity.isSuDungBangKe = !string.IsNullOrEmpty(isSuDungBangKeText) && bool.Parse(isSuDungBangKeText);
 
-            var tienThueVatText = xmlNodeHoaDonEntity["TienThueVat"]?.InnerText;
+            string tienThueVatText = xmlNodeHoaDonEntity["TienThueVat"]?.InnerText;
             hoaDonEntity.TienThueVat = !string.IsNullOrEmpty(tienThueVatText)
                 ? double.Parse(tienThueVatText)
                 : 0;
 
-            var tongTienHangText = xmlNodeHoaDonEntity["TongTienHang"]?.InnerText;
+            string tongTienHangText = xmlNodeHoaDonEntity["TongTienHang"]?.InnerText;
             hoaDonEntity.TongTienHang = !string.IsNullOrEmpty(tongTienHangText)
                 ? double.Parse(tongTienHangText)
                 : 0;
 
 
-            var tongTienThanhToanText = xmlNodeHoaDonEntity["TongTienThanhToan"]?.InnerText;
+            string tongTienThanhToanText = xmlNodeHoaDonEntity["TongTienThanhToan"]?.InnerText;
             hoaDonEntity.TongTienThanhToan = !string.IsNullOrEmpty(tongTienThanhToanText)
                 ? double.Parse(tongTienThanhToanText)
                 : 0;
 
-            var tienChietKhauText = xmlNodeHoaDonEntity["TienChietKhau"]?.InnerText;
+            string tienChietKhauText = xmlNodeHoaDonEntity["TienChietKhau"]?.InnerText;
             hoaDonEntity.TienChietKhau = !string.IsNullOrEmpty(tienChietKhauText)
                 ? double.Parse(tienChietKhauText)
                 : 0;
@@ -751,34 +756,34 @@ namespace MinvoiceWebService.Converts
                 string khuyenMaiText = xmlNodeListDetail["khuyenMai"]?.InnerText;
                 hangHoa.khuyenMai = !string.IsNullOrEmpty(khuyenMaiText) && bool.Parse(khuyenMaiText);
 
-                var soLuongText = xmlNodeListDetail["SoLuong"]?.InnerText;
+                string soLuongText = xmlNodeListDetail["SoLuong"]?.InnerText;
                 hangHoa.SoLuong = !string.IsNullOrEmpty(soLuongText) ?
                     double.Parse(soLuongText)
                     : (double?)null;
 
-                var donGiaText = xmlNodeListDetail["DonGia"]?.InnerText;
+                string donGiaText = xmlNodeListDetail["DonGia"]?.InnerText;
                 hangHoa.DonGia =
                     !string.IsNullOrEmpty(donGiaText)
                         ? double.Parse(donGiaText)
                         : (double?)null;
 
-                var thanhTienText = xmlNodeListDetail["ThanhTien"]?.InnerText;
+                string thanhTienText = xmlNodeListDetail["ThanhTien"]?.InnerText;
                 hangHoa.ThanhTien = !string.IsNullOrEmpty(thanhTienText)
                     ? double.Parse(thanhTienText)
                     : (double?)null;
 
-                var vatText = xmlNodeListDetail["Vat"]?.InnerText;
+                string vatText = xmlNodeListDetail["Vat"]?.InnerText;
                 hangHoa.Vat =
                     !string.IsNullOrEmpty(vatText)
                         ? double.Parse(vatText)
                         : (double?)null;
 
-                var tienVatText = xmlNodeListDetail["TienVat"]?.InnerText;
+                string tienVatText = xmlNodeListDetail["TienVat"]?.InnerText;
                 hangHoa.TienVat = !string.IsNullOrEmpty(tienVatText)
                     ? double.Parse(tienVatText)
                     : (double?)null;
 
-                var thanhTienSauThueText = xmlNodeListDetail["ThanhTienSauThue"]?.InnerText;
+                string thanhTienSauThueText = xmlNodeListDetail["ThanhTienSauThue"]?.InnerText;
                 hangHoa.ThanhTienSauThue =
                     !string.IsNullOrEmpty(thanhTienSauThueText)
                         ? double.Parse(thanhTienSauThueText)

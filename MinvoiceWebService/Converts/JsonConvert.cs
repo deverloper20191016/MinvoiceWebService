@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using MinvoiceWebService.Data;
+﻿using MinvoiceWebService.Data;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace MinvoiceWebService.Converts
 {
@@ -110,7 +110,7 @@ namespace MinvoiceWebService.Converts
         private static JArray CreateJarrayDetails(List<Detail> details, Master master)
         {
             JArray jArrayData = new JArray();
-            foreach (var detail in details)
+            foreach (Detail detail in details)
             {
                 JObject jObjectData = new JObject
                 {
@@ -146,6 +146,7 @@ namespace MinvoiceWebService.Converts
                     {"han_dung",detail.HanDung },
                     {"noi_san_xuat",detail.NoiSanXuat },
                     {"check_giam_tru",detail.GiamTru },
+                    {"dc_tg", detail.LoaiDieuChinh }
                 };
                 jArrayData.Add(jObjectData);
             }

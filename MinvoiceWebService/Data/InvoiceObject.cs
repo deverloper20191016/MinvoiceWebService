@@ -335,6 +335,10 @@ namespace MinvoiceWebService.Data
         /// </summary>
         public string NoiSanXuat { get; set; }
 
+        /// <summary>
+        /// Loại điều chỉnh 1: Tăng; -1: Giảm
+        /// </summary>
+        public int? LoaiDieuChinh { get; set; }
 
         public string Field1 { get; set; }
         public string Field2 { get; set; }
