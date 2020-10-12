@@ -1,0 +1,10 @@
+<Invoices>
+	<Inv>
+		<InvPattern>01GTKT0/001</InvPattern>
+		<InvSerial>MV/18E</InvSerial>
+		<InvNumber>0000250</InvNumber>
+		<SoVb>VB0000250</SoVb>
+		<NgayVb>2018-10-26</NgayVb>
+		<GhiChu>Xóa bỏ hóa đơn 0000210</GhiChu>
+	  </Inv>
+</Invoices>	 

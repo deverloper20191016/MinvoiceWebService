@@ -408,6 +408,24 @@ namespace MinvoiceWebService.Converts
                 }
 
 
+                string thueDBText = xmlNodeListDetail.SelectSingleNode("ThueDB")?.InnerText;
+                if (thueDBText != null)
+                {
+                    detail.ThueDB = !string.IsNullOrEmpty(thueDBText)
+                        ? double.Parse(thueDBText)
+                        : (double?)null;
+                }
+
+
+                string total_ThueDBText = xmlNodeListDetail.SelectSingleNode("Total_ThueDB")?.InnerText;
+                if (total_ThueDBText != null)
+                {
+                    detail.Total_ThueDB = !string.IsNullOrEmpty(total_ThueDBText)
+                        ? double.Parse(total_ThueDBText)
+                        : (double?)null;
+                }
+
+
                 details.Add(detail);
             }
             return details;

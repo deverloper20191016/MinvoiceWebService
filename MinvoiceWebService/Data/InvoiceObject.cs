@@ -235,7 +235,8 @@ namespace MinvoiceWebService.Data
         public string Field7 { get; set; }
         public string Field8 { get; set; }
         public string Field9 { get; set; }
-        public string Field10 { get; set; }
+        public string Field10 { get; set; }     
+
     }
 
     public class Detail
@@ -356,6 +357,16 @@ namespace MinvoiceWebService.Data
         public string No1 { get; set; }
 
         public string GiamTru { get; set; }
+
+        /// <summary>
+        /// inv_vatAmount: Thuế đặc biệt
+        /// </summary>
+        public double? ThueDB { get; set; }
+
+        /// <summary>
+        /// inv_vatAmount: Tiền thuế
+        /// </summary>
+        public double? Total_ThueDB { get; set; }
     }
 
     public class InvoiceCancel

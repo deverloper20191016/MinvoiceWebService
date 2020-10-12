@@ -127,7 +127,7 @@ namespace MinvoiceWebService.Converts
                     {"inv_TotalAmount", detail.TotalAmount},
                     {"inv_promotion", detail.Promotion},
                     {"inv_discountPercentage", detail.DiscountRate},
-                    {"inv_discountAmount",detail.DiscountAmount},
+                    {"inv_discountAmount",string.IsNullOrEmpty(detail.DiscountAmount.ToString()) ? 0: detail.DiscountAmount},
                     {"ma_thue",!string.IsNullOrEmpty(detail.ProdVat.ToString()) ? detail.ProdVat.GetValueOrDefault().ToString("n0") : master.VATRate},
                     {"field1",detail.Field1 },
                     {"field2",detail.Field2 },
@@ -146,7 +146,9 @@ namespace MinvoiceWebService.Converts
                     {"han_dung",detail.HanDung },
                     {"noi_san_xuat",detail.NoiSanXuat },
                     {"check_giam_tru",detail.GiamTru },
-                    {"dc_tg", detail.LoaiDieuChinh }
+                    {"dc_tg", detail.LoaiDieuChinh },
+                    {"ThueDB", detail.ThueDB },
+                    {"Total_ThueDB", detail.Total_ThueDB },
                 };
                 jArrayData.Add(jObjectData);
             }
