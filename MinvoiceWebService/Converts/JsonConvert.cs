@@ -80,15 +80,40 @@ namespace MinvoiceWebService.Converts
 
             };
 
+           
+
             if (dataRequestObject.SignType.HasValue)
             {
                 jObject.Add("sign_type", dataRequestObject.SignType.Value.ToString());
             }
 
+
             if (!string.IsNullOrEmpty(dataRequestObject.InvInvoiceCodeId))
             {
-                jObject.Add("inv_InvoiceCode_id", dataRequestObject.InvInvoiceCodeId);
+                if (jObject.ContainsKey("inv_InvoiceCode_id"))
+                {
+                    jObject["inv_InvoiceCode_id"] = dataRequestObject.InvInvoiceCodeId;
+                }
+                else
+                {
+                    jObject.Add("inv_InvoiceCode_id", dataRequestObject.InvInvoiceCodeId);
+                }
+                    
             }
+
+
+            if (!string.IsNullOrEmpty(invoice.Master.InvInvoiceCodeId))
+            {
+                if (jObject.ContainsKey("inv_InvoiceCode_id"))
+                {
+                    jObject["inv_InvoiceCode_id"] = invoice.Master.InvInvoiceCodeId;
+                }
+                else
+                {
+                    jObject.Add("inv_InvoiceCode_id", invoice.Master.InvInvoiceCodeId);
+                }
+            }
+
 
             JArray jArrayDetails = CreateJarrayDetails(invoice.Details, invoice.Master);
             jObject.Add("details", jArrayDetails);

@@ -10,6 +10,12 @@ namespace MinvoiceWebService.Data
 
     public class Master
     {
+
+        /// <summary>
+        /// inv_InvoiceCode_id: Key hóa đơn
+        /// </summary>
+        public string InvInvoiceCodeId { get; set; }
+
         /// <summary>
         /// so_benh_an: Key hóa đơn
         /// </summary>

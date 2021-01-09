@@ -1,10 +1,10 @@
-﻿using System;
+﻿using MinvoiceWebService.Data;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using MinvoiceWebService.Data;
-using Newtonsoft.Json.Linq;
 
 namespace MinvoiceWebService.Services
 {
@@ -12,7 +12,7 @@ namespace MinvoiceWebService.Services
     {
         private static JObject Login(string username, string password, string mst)
         {
-            var client = new WebClient
+            WebClient client = new WebClient
             {
                 Encoding = Encoding.UTF8
             };
@@ -24,28 +24,36 @@ namespace MinvoiceWebService.Services
                 {"ma_dvcs","VP" }
             };
 
-            var urlLogin = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlLoginApi}";
+            string urlLogin = $"{CommonConstants.Potocol}{mst}.{CommonConstants.UrlLoginApi}";
             //var urlLogin = CommonConstants.UrlLogin;
-            var token = client.UploadString(urlLogin, json.ToString());
+            string token = client.UploadString(urlLogin, json.ToString());
             return JObject.Parse(token);
         }
 
         private static void CreateAuthorization(WebClient webClient, string username, string pass, string mst)
         {
-            var tokenJson = Login(username, pass, mst);
-            var authorization = "Bear " + tokenJson["token"] + ";VP;vi";
-            webClient.Headers[HttpRequestHeader.Authorization] = authorization;
+            JObject tokenJson = Login(username, pass, mst);
+            if (tokenJson.ContainsKey("token"))
+            {
+                string authorization = "Bear " + tokenJson["token"] + ";VP;vi";
+                webClient.Headers[HttpRequestHeader.Authorization] = authorization;
+            }
+            else
+            {
+                throw new Exception(tokenJson["error"].ToString());
+            }
+
         }
 
         private static void CreateAuthorizationIPos(WebClient webClient, string token, string mst)
         {
-            var authorization = "Bear " + token;
+            string authorization = "Bear " + token;
             webClient.Headers[HttpRequestHeader.Authorization] = authorization;
         }
 
         public static WebClient SetupWebClient(string userName, string passWord, string mst)
         {
-            var webClient = new WebClient
+            WebClient webClient = new WebClient
             {
                 Encoding = Encoding.UTF8
             };
@@ -58,7 +66,7 @@ namespace MinvoiceWebService.Services
 
         public static WebClient SetupWebClientIPos(string mst, string token)
         {
-            var webClient = new WebClient
+            WebClient webClient = new WebClient
             {
                 Encoding = Encoding.UTF8
             };
@@ -70,8 +78,8 @@ namespace MinvoiceWebService.Services
 
         public static HttpClient SetupHttpClient(string username, string pass, string mst)
         {
-            var tokenJson = Login(username, pass, mst);
-            var token = tokenJson["token"] + ";VP;vi";
+            JObject tokenJson = Login(username, pass, mst);
+            string token = tokenJson["token"] + ";VP;vi";
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bear", token);

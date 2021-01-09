@@ -107,6 +107,13 @@ namespace MinvoiceWebService
             return result;
         }
 
+        [WebMethod]
+        public string DownloadXmlBase64(string mst, string userName, string passWord, string mauSo, string kyHieu, string invoiceNumber)
+        {
+            var result = MinvoiceService.DownloadXmlBase64(mst, userName, passWord, mauSo, kyHieu, invoiceNumber);
+            return result;
+        }
+
         //Convert to font
 
 

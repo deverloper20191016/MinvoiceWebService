@@ -81,6 +81,10 @@ namespace MinvoiceWebService.Converts
         {
             Master master = new Master
             {
+                InvInvoiceCodeId = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("InvoiceCodeId")?.InnerText)
+                    ? xmlNodeMaster.SelectSingleNode("InvoiceCodeId")?.InnerText
+                    : null,
+
                 VATRate = !string.IsNullOrEmpty(xmlNodeMaster.SelectSingleNode("VATRate")?.InnerText)
                     ? xmlNodeMaster.SelectSingleNode("VATRate")?.InnerText
                     : null,
